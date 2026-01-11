@@ -1,0 +1,1323 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>iPhone Prank Call Simulator</title>
+    <meta name="apple-mobile-web-app-capable" content="yes">
+    <meta name="mobile-web-app-capable" content="yes">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Oxygen, Ubuntu, Cantarell, sans-serif;
+            -webkit-tap-highlight-color: transparent;
+        }
+        
+        html, body {
+            height: 100%;
+            overflow: hidden;
+            background: #000;
+        }
+        
+        body {
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+        }
+        
+        /* Fullscreen container */
+        #app-container {
+            width: 100%;
+            height: 100%;
+            display: flex;
+            flex-direction: column;
+            justify-content: center;
+            align-items: center;
+            padding: 10px;
+        }
+        
+        /* Fullscreen mode styling */
+        body.fullscreen {
+            background: #000;
+            padding: 0;
+        }
+        
+        body.fullscreen #app-container {
+            padding: 0;
+        }
+        
+        /* iPhone frame for non-fullscreen mode */
+        .iphone-frame {
+            width: 100%;
+            max-width: 380px;
+            height: 780px;
+            background: #111;
+            border-radius: 50px;
+            box-shadow: 0 20px 50px rgba(0, 0, 0, 0.5);
+            padding: 15px;
+            position: relative;
+            margin: 0 auto;
+        }
+        
+        /* Fullscreen iPhone simulation */
+        .iphone-screen {
+            width: 100%;
+            height: 100%;
+            background: #000;
+            border-radius: 40px;
+            overflow: hidden;
+            position: relative;
+        }
+        
+        body.fullscreen .iphone-frame {
+            max-width: 100%;
+            height: 100%;
+            border-radius: 0;
+            padding: 0;
+            box-shadow: none;
+            background: #000;
+        }
+        
+        body.fullscreen .iphone-screen {
+            border-radius: 0;
+        }
+        
+        .screen-content {
+            width: 100%;
+            height: 100%;
+            display: flex;
+            flex-direction: column;
+        }
+        
+        /* Status bar */
+        .status-bar {
+            height: 44px;
+            background: rgba(0,0,0,0.9);
+            color: white;
+            display: flex;
+            justify-content: space-between;
+            padding: 0 30px;
+            align-items: center;
+            font-size: 14px;
+            font-weight: 600;
+            position: relative;
+            z-index: 10;
+        }
+        
+        .time {
+            font-weight: bold;
+        }
+        
+        /* Home indicator */
+        .home-indicator {
+            position: absolute;
+            bottom: 10px;
+            left: 50%;
+            transform: translateX(-50%);
+            width: 134px;
+            height: 5px;
+            background: rgba(255,255,255,0.8);
+            border-radius: 10px;
+            z-index: 10;
+        }
+        
+        /* Home screen */
+        .home-screen {
+            flex: 1;
+            background: linear-gradient(180deg, #0a0a0a 0%, #1a1a1a 100%);
+            padding: 20px;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            position: relative;
+        }
+        
+        .home-screen h2 {
+            color: white;
+            font-size: 24px;
+            margin-bottom: 30px;
+            text-align: center;
+        }
+        
+        .app-icon {
+            width: 80px;
+            height: 80px;
+            background: linear-gradient(135deg, #ff7a18, #ff2581);
+            border-radius: 22px;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            color: white;
+            font-size: 36px;
+            margin-bottom: 10px;
+            cursor: pointer;
+            box-shadow: 0 5px 15px rgba(255, 37, 129, 0.3);
+            animation: pulse 2s infinite;
+        }
+        
+        @keyframes pulse {
+            0% { transform: scale(1); }
+            50% { transform: scale(1.05); }
+            100% { transform: scale(1); }
+        }
+        
+        /* Call screen */
+        .call-screen {
+            flex: 1;
+            background: linear-gradient(180deg, #000000 0%, #1a1a2e 100%);
+            padding: 30px 20px;
+            display: none;
+            flex-direction: column;
+            align-items: center;
+            justify-content: space-between;
+            color: white;
+        }
+        
+        .caller-info {
+            text-align: center;
+            margin-top: 40px;
+        }
+        
+        .caller-photo {
+            width: 140px;
+            height: 140px;
+            border-radius: 70px;
+            margin: 0 auto 20px;
+            overflow: hidden;
+            border: 3px solid rgba(255,255,255,0.2);
+            box-shadow: 0 10px 25px rgba(0,0,0,0.3);
+        }
+        
+        .caller-photo img {
+            width: 100%;
+            height: 100%;
+            object-fit: cover;
+        }
+        
+        .caller-name {
+            font-size: 36px;
+            font-weight: 600;
+            margin-bottom: 8px;
+        }
+        
+        .call-status {
+            font-size: 20px;
+            color: #aaa;
+            margin-bottom: 80px;
+        }
+        
+        .call-controls {
+            width: 100%;
+            display: flex;
+            justify-content: center;
+            gap: 60px;
+            margin-bottom: 60px;
+        }
+        
+        .call-btn {
+            width: 80px;
+            height: 80px;
+            border-radius: 40px;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            font-size: 32px;
+            cursor: pointer;
+            transition: all 0.2s;
+            box-shadow: 0 5px 15px rgba(0,0,0,0.3);
+        }
+        
+        .call-btn:hover {
+            transform: scale(1.1);
+        }
+        
+        .accept-call {
+            background: #30d158;
+            color: white;
+        }
+        
+        .decline-call {
+            background: #ff3b30;
+            color: white;
+        }
+        
+        /* Control panel */
+        .control-panel {
+            background: white;
+            border-radius: 20px;
+            padding: 25px;
+            width: 100%;
+            max-width: 600px;
+            margin-top: 20px;
+            box-shadow: 0 10px 30px rgba(0, 0, 0, 0.2);
+            overflow-y: auto;
+            max-height: 300px;
+        }
+        
+        body.fullscreen .control-panel {
+            display: none;
+        }
+        
+        .control-panel h2 {
+            color: #333;
+            margin-bottom: 20px;
+            text-align: center;
+        }
+        
+        .input-group {
+            margin-bottom: 15px;
+        }
+        
+        label {
+            display: block;
+            margin-bottom: 6px;
+            color: #555;
+            font-weight: 500;
+            font-size: 14px;
+        }
+        
+        input, select {
+            width: 100%;
+            padding: 10px 12px;
+            border: 1px solid #ddd;
+            border-radius: 10px;
+            font-size: 15px;
+        }
+        
+        .button-group {
+            display: flex;
+            gap: 12px;
+            margin-top: 20px;
+            flex-wrap: wrap;
+        }
+        
+        button {
+            flex: 1;
+            min-width: 120px;
+            padding: 12px;
+            border: none;
+            border-radius: 12px;
+            font-size: 15px;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.2s;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 8px;
+        }
+        
+        .primary-btn {
+            background: linear-gradient(to right, #667eea, #764ba2);
+            color: white;
+        }
+        
+        .secondary-btn {
+            background: #f0f0f0;
+            color: #333;
+        }
+        
+        .seduce-btn {
+            background: linear-gradient(to right, #ff416c, #ff4b2b);
+            color: white;
+        }
+        
+        button:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 5px 15px rgba(0, 0, 0, 0.1);
+        }
+        
+        .notification {
+            position: fixed;
+            top: 20px;
+            right: 20px;
+            background: #30d158;
+            color: white;
+            padding: 15px 25px;
+            border-radius: 10px;
+            box-shadow: 0 5px 15px rgba(0, 0, 0, 0.2);
+            display: none;
+            z-index: 1000;
+            font-weight: 500;
+            max-width: 300px;
+        }
+        
+        /* Call in progress screen */
+        .call-in-progress {
+            flex: 1;
+            background: linear-gradient(180deg, #000000 0%, #1a1a2e 100%);
+            padding: 30px 20px;
+            display: none;
+            flex-direction: column;
+            align-items: center;
+            justify-content: space-between;
+            color: white;
+        }
+        
+        .call-timer {
+            font-size: 36px;
+            margin-top: 80px;
+            font-weight: 300;
+            letter-spacing: 2px;
+        }
+        
+        .end-call-btn {
+            width: 80px;
+            height: 80px;
+            border-radius: 40px;
+            background: #ff3b30;
+            color: white;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            font-size: 32px;
+            cursor: pointer;
+            margin-bottom: 60px;
+            transition: all 0.2s;
+            box-shadow: 0 5px 15px rgba(0,0,0,0.3);
+        }
+        
+        .end-call-btn:hover {
+            transform: scale(1.1);
+        }
+        
+        /* Fullscreen toggle */
+        .fullscreen-toggle {
+            position: fixed;
+            bottom: 20px;
+            right: 20px;
+            width: 50px;
+            height: 50px;
+            background: rgba(0,0,0,0.7);
+            color: white;
+            border-radius: 25px;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            font-size: 20px;
+            cursor: pointer;
+            z-index: 1000;
+            box-shadow: 0 5px 15px rgba(0,0,0,0.3);
+        }
+        
+        body.fullscreen .fullscreen-toggle {
+            background: rgba(255,255,255,0.2);
+        }
+        
+        /* Seduce call specific styles */
+        .seduce-theme .call-screen {
+            background: linear-gradient(180deg, #2d0b3d 0%, #6a0dad 100%);
+        }
+        
+        .seduce-theme .caller-photo {
+            border: 3px solid rgba(255, 105, 180, 0.4);
+            box-shadow: 0 10px 25px rgba(255, 105, 180, 0.2);
+        }
+        
+        .seduce-theme .caller-name {
+            color: #ffb6c1;
+        }
+        
+        .seduce-theme .accept-call {
+            background: linear-gradient(to right, #ff1493, #ff69b4);
+        }
+        
+        /* Audio upload styling */
+        .audio-upload-container {
+            border: 2px dashed #ddd;
+            border-radius: 10px;
+            padding: 15px;
+            text-align: center;
+            margin-bottom: 15px;
+        }
+        
+        .audio-upload-container.dragover {
+            border-color: #667eea;
+            background: rgba(102, 126, 234, 0.1);
+        }
+        
+        .audio-upload-btn {
+            background: #4CAF50;
+            color: white;
+            padding: 8px 15px;
+            border-radius: 8px;
+            cursor: pointer;
+            display: inline-block;
+            margin: 10px 0;
+        }
+        
+        .audio-preview {
+            margin-top: 10px;
+            font-size: 14px;
+            color: #666;
+        }
+        
+        /* Mobile optimization */
+        @media (max-width: 768px) {
+            .control-panel {
+                max-height: 250px;
+                padding: 20px;
+            }
+            
+            button {
+                min-width: 100px;
+                padding: 10px;
+                font-size: 14px;
+            }
+            
+            .fullscreen-toggle {
+                bottom: 10px;
+                right: 10px;
+                width: 45px;
+                height: 45px;
+                font-size: 18px;
+            }
+        }
+        
+        @media (max-height: 700px) {
+            .control-panel {
+                display: none;
+            }
+            
+            .fullscreen-toggle {
+                display: none;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="notification" id="notification">Call started! Show this to your friend.</div>
+    
+    <div class="fullscreen-toggle" id="fullscreen-toggle">
+        <i class="fas fa-expand"></i>
+    </div>
+    
+    <div id="app-container">
+        <div class="iphone-frame">
+            <div class="iphone-screen">
+                <div class="screen-content">
+                    <div class="status-bar">
+                        <div class="time" id="current-time">9:41</div>
+                        <div class="icons">
+                            <i class="fas fa-signal"></i>
+                            <i class="fas fa-wifi" style="margin-left: 5px;"></i>
+                            <i class="fas fa-battery-full" style="margin-left: 5px;"></i>
+                        </div>
+                    </div>
+                    
+                    <!-- Home Screen -->
+                    <div class="home-screen" id="home-screen">
+                        <h2>Prank Call Simulator</h2>
+                        <div class="app-icon" id="app-icon">
+                            <i class="fas fa-phone-alt"></i>
+                        </div>
+                        <span style="color: white; margin-top: 10px; text-align: center; padding: 0 20px;">
+                            Tap the icon or use the controls below to start a prank call
+                        </span>
+                        
+                        <!-- Quick start buttons on home screen for fullscreen mode -->
+                        <div class="button-group" id="quick-start-buttons" style="margin-top: 30px; display: none;">
+                            <button class="secondary-btn" id="quick-test-btn">
+                                <i class="fas fa-bell"></i> Test
+                            </button>
+                            <button class="seduce-btn" id="quick-seduce-btn">
+                                <i class="fas fa-heart"></i> Seduce
+                            </button>
+                            <button class="primary-btn" id="quick-start-btn">
+                                <i class="fas fa-play"></i> Start
+                            </button>
+                        </div>
+                    </div>
+                    
+                    <!-- Incoming Call Screen -->
+                    <div class="call-screen" id="call-screen">
+                        <div class="caller-info">
+                            <div class="caller-photo">
+                                <img id="caller-photo" src="https://images.unsplash.com/photo-1494790108755-2616b786d4d9?ixlib=rb-1.2.1&auto=format&fit=crop&w=500&q=80" alt="Caller">
+                            </div>
+                            <div class="caller-name" id="caller-name">Jessica</div>
+                            <div class="call-status" id="call-status">mobile</div>
+                        </div>
+                        
+                        <div class="call-controls">
+                            <div class="call-btn decline-call" id="decline-btn">
+                                <i class="fas fa-phone-slash"></i>
+                            </div>
+                            <div class="call-btn accept-call" id="accept-btn">
+                                <i class="fas fa-phone"></i>
+                            </div>
+                        </div>
+                    </div>
+                    
+                    <!-- Call In Progress Screen -->
+                    <div class="call-in-progress" id="call-in-progress">
+                        <div class="caller-info">
+                            <div class="caller-photo">
+                                <img id="active-caller-photo" src="https://images.unsplash.com/photo-1494790108755-2616b786d4d9?ixlib=rb-1.2.1&auto=format&fit=crop&w=500&q=80" alt="Caller">
+                            </div>
+                            <div class="caller-name" id="active-caller-name">Jessica</div>
+                            <div class="call-timer" id="call-timer">00:00</div>
+                        </div>
+                        
+                        <div class="end-call-btn" id="end-call-btn">
+                            <i class="fas fa-phone-slash"></i>
+                        </div>
+                    </div>
+                    
+                    <div class="home-indicator"></div>
+                </div>
+            </div>
+        </div>
+        
+        <div class="control-panel" id="control-panel">
+            <h2>Configure Prank Call</h2>
+            
+            <div class="input-group">
+                <label for="caller-name-input">Caller Name</label>
+                <input type="text" id="caller-name-input" value="Jessica" placeholder="Enter caller name">
+            </div>
+            
+            <div class="input-group">
+                <label for="caller-photo-select">Caller Photo</label>
+                <select id="caller-photo-select">
+                    <option value="seduce1">Attractive Woman</option>
+                    <option value="seduce2">Seductive Look</option>
+                    <option value="seduce3">Mysterious Caller</option>
+                    <option value="business">Business Person</option>
+                    <option value="celebrity">Celebrity</option>
+                    <option value="custom">Custom Upload</option>
+                </select>
+            </div>
+            
+            <div class="input-group" id="custom-photo-upload" style="display: none;">
+                <label>Upload Custom Photo</label>
+                <div class="audio-upload-container" id="photo-drop-area">
+                    <p>Drag & drop a photo or</p>
+                    <div class="audio-upload-btn" id="photo-upload-btn">Choose File</div>
+                    <input type="file" id="photo-file-input" accept="image/*" style="display: none;">
+                    <div class="audio-preview" id="photo-preview"></div>
+                </div>
+            </div>
+            
+            <div class="input-group">
+                <label for="call-type">Call Type</label>
+                <select id="call-type">
+                    <option value="mobile">Mobile</option>
+                    <option value="home">Home</option>
+                    <option value="private">Private Number</option>
+                    <option value="unknown">Unknown</option>
+                </select>
+            </div>
+            
+            <div class="input-group">
+                <label>Ringtone</label>
+                <select id="ringtone">
+                    <option value="iphone">iPhone Ringtone</option>
+                    <option value="seduce">Seductive Tone</option>
+                    <option value="romantic">Romantic Ringtone</option>
+                    <option value="custom">Custom Upload</option>
+                    <option value="vibrate">Vibrate Only</option>
+                </select>
+            </div>
+            
+            <div class="input-group" id="custom-audio-upload" style="display: none;">
+                <label>Upload Custom Ringtone</label>
+                <div class="audio-upload-container" id="audio-drop-area">
+                    <p>Drag & drop an audio file or</p>
+                    <div class="audio-upload-btn" id="audio-upload-btn">Choose File</div>
+                    <input type="file" id="audio-file-input" accept="audio/*" style="display: none;">
+                    <div class="audio-preview" id="audio-preview"></div>
+                </div>
+            </div>
+            
+            <div class="button-group">
+                <button class="secondary-btn" id="test-call-btn">
+                    <i class="fas fa-bell"></i> Test
+                </button>
+                <button class="seduce-btn" id="seduce-call-btn">
+                    <i class="fas fa-heart"></i> Seduce Call
+                </button>
+                <button class="primary-btn" id="start-call-btn">
+                    <i class="fas fa-play"></i> Start Prank
+                </button>
+            </div>
+            
+            <div style="margin-top: 15px; text-align: center; color: #666; font-size: 13px;">
+                <p><i class="fas fa-info-circle"></i> Go fullscreen for the most realistic experience!</p>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        // DOM Elements
+        const homeScreen = document.getElementById('home-screen');
+        const callScreen = document.getElementById('call-screen');
+        const callInProgress = document.getElementById('call-in-progress');
+        const appIcon = document.getElementById('app-icon');
+        const acceptBtn = document.getElementById('accept-btn');
+        const declineBtn = document.getElementById('decline-btn');
+        const endCallBtn = document.getElementById('end-call-btn');
+        const testCallBtn = document.getElementById('test-call-btn');
+        const seduceCallBtn = document.getElementById('seduce-call-btn');
+        const startCallBtn = document.getElementById('start-call-btn');
+        const notification = document.getElementById('notification');
+        const fullscreenToggle = document.getElementById('fullscreen-toggle');
+        const controlPanel = document.getElementById('control-panel');
+        const quickStartButtons = document.getElementById('quick-start-buttons');
+        const quickTestBtn = document.getElementById('quick-test-btn');
+        const quickSeduceBtn = document.getElementById('quick-seduce-btn');
+        const quickStartBtn = document.getElementById('quick-start-btn');
+        
+        // Input elements
+        const callerNameInput = document.getElementById('caller-name-input');
+        const callerPhotoSelect = document.getElementById('caller-photo-select');
+        const callTypeSelect = document.getElementById('call-type');
+        const ringtoneSelect = document.getElementById('ringtone');
+        const customPhotoUpload = document.getElementById('custom-photo-upload');
+        const customAudioUpload = document.getElementById('custom-audio-upload');
+        const photoFileInput = document.getElementById('photo-file-input');
+        const audioFileInput = document.getElementById('audio-file-input');
+        const photoUploadBtn = document.getElementById('photo-upload-btn');
+        const audioUploadBtn = document.getElementById('audio-upload-btn');
+        const photoDropArea = document.getElementById('photo-drop-area');
+        const audioDropArea = document.getElementById('audio-drop-area');
+        const photoPreview = document.getElementById('photo-preview');
+        const audioPreview = document.getElementById('audio-preview');
+        
+        // Call elements
+        const callerNameElement = document.getElementById('caller-name');
+        const callerPhotoElement = document.getElementById('caller-photo');
+        const callStatusElement = document.getElementById('call-status');
+        const activeCallerNameElement = document.getElementById('active-caller-name');
+        const activeCallerPhotoElement = document.getElementById('active-caller-photo');
+        const callTimerElement = document.getElementById('call-timer');
+        const currentTimeElement = document.getElementById('current-time');
+        
+        // Variables
+        let callTimer = 0;
+        let timerInterval = null;
+        let ringtoneAudio = null;
+        let customAudioFile = null;
+        let customPhotoFile = null;
+        let isSeduceMode = false;
+        
+        // Seduce mode configurations
+        const seduceConfigs = [
+            { name: "Jessica", photo: "seduce1", type: "mobile" },
+            { name: "Sophia", photo: "seduce2", type: "private" },
+            { name: "Mystery Caller", photo: "seduce3", type: "unknown" },
+            { name: "Isabella", photo: "seduce1", type: "mobile" },
+            { name: "Emma", photo: "seduce2", type: "private" }
+        ];
+        
+        // Update current time
+        function updateTime() {
+            const now = new Date();
+            let hours = now.getHours();
+            let minutes = now.getMinutes();
+            minutes = minutes < 10 ? '0' + minutes : minutes;
+            currentTimeElement.textContent = `${hours}:${minutes}`;
+        }
+        
+        // Update time immediately and then every minute
+        updateTime();
+        setInterval(updateTime, 60000);
+        
+        // Initialize the app
+        function initApp() {
+            // Check if mobile device
+            if (/Mobi|Android|iPhone|iPad|iPod|BlackBerry|IEMobile|Opera Mini/i.test(navigator.userAgent)) {
+                // Hide control panel on small screens
+                if (window.innerHeight < 700) {
+                    controlPanel.style.display = 'none';
+                    quickStartButtons.style.display = 'flex';
+                }
+                
+                // Auto-enter fullscreen for mobile
+                setTimeout(() => {
+                    enterFullscreen();
+                }, 500);
+            }
+            
+            // Set default caller photo
+            updateCallerPhoto();
+            
+            // Set up event listeners
+            appIcon.addEventListener('click', () => {
+                showNotification("Use the controls below to start a prank call!");
+            });
+            
+            callerNameInput.addEventListener('input', updateCallerInfo);
+            callerPhotoSelect.addEventListener('change', handlePhotoSelectChange);
+            callTypeSelect.addEventListener('change', updateCallType);
+            ringtoneSelect.addEventListener('change', handleRingtoneSelectChange);
+            
+            acceptBtn.addEventListener('click', acceptCall);
+            declineBtn.addEventListener('click', declineCall);
+            endCallBtn.addEventListener('click', endCall);
+            
+            testCallBtn.addEventListener('click', testCall);
+            seduceCallBtn.addEventListener('click', startSeduceCall);
+            startCallBtn.addEventListener('click', startPrankCall);
+            
+            quickTestBtn.addEventListener('click', testCall);
+            quickSeduceBtn.addEventListener('click', startSeduceCall);
+            quickStartBtn.addEventListener('click', startPrankCall);
+            
+            // Fullscreen toggle
+            fullscreenToggle.addEventListener('click', toggleFullscreen);
+            
+            // Custom file uploads
+            photoUploadBtn.addEventListener('click', () => photoFileInput.click());
+            audioUploadBtn.addEventListener('click', () => audioFileInput.click());
+            
+            photoFileInput.addEventListener('change', handlePhotoUpload);
+            audioFileInput.addEventListener('change', handleAudioUpload);
+            
+            // Drag and drop for files
+            setupDragAndDrop();
+            
+            // Handle device orientation changes
+            window.addEventListener('resize', handleResize);
+            window.addEventListener('orientationchange', handleResize);
+            
+            // Prevent accidental scrolling during prank
+            document.addEventListener('touchmove', function(e) {
+                if (callScreen.style.display === 'flex' || callInProgress.style.display === 'flex') {
+                    e.preventDefault();
+                }
+            }, { passive: false });
+        }
+        
+        // Handle photo select change
+        function handlePhotoSelectChange() {
+            const value = callerPhotoSelect.value;
+            if (value === 'custom') {
+                customPhotoUpload.style.display = 'block';
+                if (customPhotoFile) {
+                    updateCustomPhoto();
+                }
+            } else {
+                customPhotoUpload.style.display = 'none';
+                updateCallerPhoto();
+            }
+        }
+        
+        // Handle ringtone select change
+        function handleRingtoneSelectChange() {
+            const value = ringtoneSelect.value;
+            if (value === 'custom') {
+                customAudioUpload.style.display = 'block';
+                if (customAudioFile) {
+                    updateAudioPreview();
+                }
+            } else {
+                customAudioUpload.style.display = 'none';
+            }
+        }
+        
+        // Setup drag and drop for files
+        function setupDragAndDrop() {
+            // Photo drag and drop
+            photoDropArea.addEventListener('dragover', (e) => {
+                e.preventDefault();
+                photoDropArea.classList.add('dragover');
+            });
+            
+            photoDropArea.addEventListener('dragleave', () => {
+                photoDropArea.classList.remove('dragover');
+            });
+            
+            photoDropArea.addEventListener('drop', (e) => {
+                e.preventDefault();
+                photoDropArea.classList.remove('dragover');
+                
+                const files = e.dataTransfer.files;
+                if (files.length > 0) {
+                    handlePhotoFile(files[0]);
+                }
+            });
+            
+            // Audio drag and drop
+            audioDropArea.addEventListener('dragover', (e) => {
+                e.preventDefault();
+                audioDropArea.classList.add('dragover');
+            });
+            
+            audioDropArea.addEventListener('dragleave', () => {
+                audioDropArea.classList.remove('dragover');
+            });
+            
+            audioDropArea.addEventListener('drop', (e) => {
+                e.preventDefault();
+                audioDropArea.classList.remove('dragover');
+                
+                const files = e.dataTransfer.files;
+                if (files.length > 0) {
+                    handleAudioFile(files[0]);
+                }
+            });
+        }
+        
+        // Handle photo upload
+        function handlePhotoUpload(e) {
+            const file = e.target.files[0];
+            if (file) {
+                handlePhotoFile(file);
+            }
+        }
+        
+        // Handle photo file
+        function handlePhotoFile(file) {
+            if (!file.type.match('image.*')) {
+                showError("Please select an image file");
+                return;
+            }
+            
+            if (file.size > 5 * 1024 * 1024) {
+                showError("Image file is too large (max 5MB)");
+                return;
+            }
+            
+            customPhotoFile = file;
+            updateCustomPhoto();
+            photoPreview.innerHTML = `<i class="fas fa-check"></i> ${file.name} (${(file.size/1024).toFixed(1)} KB)`;
+        }
+        
+        // Update custom photo
+        function updateCustomPhoto() {
+            if (customPhotoFile) {
+                const reader = new FileReader();
+                reader.onload = function(e) {
+                    callerPhotoElement.src = e.target.result;
+                    activeCallerPhotoElement.src = e.target.result;
+                };
+                reader.readAsDataURL(customPhotoFile);
+            }
+        }
+        
+        // Handle audio upload
+        function handleAudioUpload(e) {
+            const file = e.target.files[0];
+            if (file) {
+                handleAudioFile(file);
+            }
+        }
+        
+        // Handle audio file
+        function handleAudioFile(file) {
+            if (!file.type.match('audio.*')) {
+                showError("Please select an audio file");
+                return;
+            }
+            
+            if (file.size > 10 * 1024 * 1024) {
+                showError("Audio file is too large (max 10MB)");
+                return;
+            }
+            
+            customAudioFile = file;
+            updateAudioPreview();
+            audioPreview.innerHTML = `<i class="fas fa-check"></i> ${file.name} (${(file.size/1024).toFixed(1)} KB)`;
+        }
+        
+        // Update audio preview
+        function updateAudioPreview() {
+            // Preview is already shown in the UI
+        }
+        
+        // Handle resize/orientation change
+        function handleResize() {
+            // Show/hide control panel based on screen height
+            if (window.innerHeight < 700) {
+                controlPanel.style.display = 'none';
+                quickStartButtons.style.display = 'flex';
+            } else if (!document.body.classList.contains('fullscreen')) {
+                controlPanel.style.display = 'block';
+                quickStartButtons.style.display = 'none';
+            }
+        }
+        
+        // Update caller info
+        function updateCallerInfo() {
+            const name = callerNameInput.value || "Unknown";
+            callerNameElement.textContent = name;
+            activeCallerNameElement.textContent = name;
+        }
+        
+        // Update caller photo based on selection
+        function updateCallerPhoto() {
+            const photoOption = callerPhotoSelect.value;
+            let photoUrl = "";
+            
+            switch(photoOption) {
+                case 'seduce1':
+                    photoUrl = "https://images.unsplash.com/photo-1494790108755-2616b786d4d9?ixlib=rb-1.2.1&auto=format&fit=crop&w=500&q=80";
+                    break;
+                case 'seduce2':
+                    photoUrl = "https://images.unsplash.com/photo-1534528741775-53994a69daeb?ixlib=rb-1.2.1&auto=format&fit=crop&w=500&q=80";
+                    break;
+                case 'seduce3':
+                    photoUrl = "https://images.unsplash.com/photo-1529626455594-4ff0802cfb7e?ixlib=rb-1.2.1&auto=format&fit=crop&w=500&q=80";
+                    break;
+                case 'business':
+                    photoUrl = "https://images.unsplash.com/photo-1507003211169-0a1dd7228f2d?ixlib=rb-1.2.1&auto=format&fit=crop&w=500&q=80";
+                    break;
+                case 'celebrity':
+                    photoUrl = "https://images.unsplash.com/photo-1519058082700-08a0b56da9b4?ixlib=rb-1.2.1&auto=format&fit=crop&w=500&q=80";
+                    break;
+                default:
+                    photoUrl = "https://images.unsplash.com/photo-1494790108755-2616b786d4d9?ixlib=rb-1.2.1&auto=format&fit=crop&w=500&q=80";
+            }
+            
+            callerPhotoElement.src = photoUrl;
+            activeCallerPhotoElement.src = photoUrl;
+        }
+        
+        // Update call type
+        function updateCallType() {
+            const type = callTypeSelect.value;
+            let displayText = "";
+            
+            switch(type) {
+                case 'mobile': displayText = "mobile"; break;
+                case 'home': displayText = "home"; break;
+                case 'private': displayText = "Private Number"; break;
+                case 'unknown': displayText = "Unknown"; break;
+                default: displayText = "mobile";
+            }
+            
+            callStatusElement.textContent = displayText;
+        }
+        
+        // Show notification
+        function showNotification(message) {
+            notification.textContent = message;
+            notification.style.display = 'block';
+            notification.style.background = '#30d158';
+            
+            setTimeout(() => {
+                notification.style.display = 'none';
+            }, 3000);
+        }
+        
+        // Show error notification
+        function showError(message) {
+            notification.textContent = message;
+            notification.style.display = 'block';
+            notification.style.background = '#ff3b30';
+            
+            setTimeout(() => {
+                notification.style.display = 'none';
+            }, 3000);
+        }
+        
+        // Enter fullscreen mode
+        function enterFullscreen() {
+            if (!document.fullscreenElement) {
+                document.documentElement.requestFullscreen().catch(err => {
+                    console.log(`Error attempting to enable fullscreen: ${err.message}`);
+                });
+            }
+            document.body.classList.add('fullscreen');
+            fullscreenToggle.innerHTML = '<i class="fas fa-compress"></i>';
+            controlPanel.style.display = 'none';
+            quickStartButtons.style.display = 'flex';
+        }
+        
+        // Exit fullscreen mode
+        function exitFullscreen() {
+            if (document.fullscreenElement) {
+                document.exitFullscreen();
+            }
+            document.body.classList.remove('fullscreen');
+            fullscreenToggle.innerHTML = '<i class="fas fa-expand"></i>';
+            
+            if (window.innerHeight >= 700) {
+                controlPanel.style.display = 'block';
+            }
+            quickStartButtons.style.display = 'none';
+        }
+        
+        // Toggle fullscreen mode
+        function toggleFullscreen() {
+            if (document.body.classList.contains('fullscreen')) {
+                exitFullscreen();
+            } else {
+                enterFullscreen();
+            }
+        }
+        
+        // Test the call screen
+        function testCall() {
+            // Update caller info from inputs
+            updateCallerInfo();
+            updateCallerPhoto();
+            updateCallType();
+            
+            // Show call screen
+            homeScreen.style.display = 'none';
+            callScreen.style.display = 'flex';
+            callInProgress.style.display = 'none';
+            
+            // Apply seduce theme if in seduce mode
+            if (isSeduceMode) {
+                document.body.classList.add('seduce-theme');
+            } else {
+                document.body.classList.remove('seduce-theme');
+            }
+            
+            // Play ringtone if not silent
+            const ringtone = ringtoneSelect.value;
+            if (ringtone !== 'vibrate') {
+                playRingtone();
+            }
+            
+            showNotification("Test call started! The iPhone is now showing an incoming call.");
+        }
+        
+        // Start a seduce call
+        function startSeduceCall() {
+            // Random seduce configuration
+            const randomConfig = seduceConfigs[Math.floor(Math.random() * seduceConfigs.length)];
+            
+            // Update UI with seduce config
+            callerNameInput.value = randomConfig.name;
+            callerPhotoSelect.value = randomConfig.photo;
+            callTypeSelect.value = randomConfig.type;
+            
+            // Update caller info
+            updateCallerInfo();
+            updateCallerPhoto();
+            updateCallType();
+            
+            // Set seduce ringtone
+            ringtoneSelect.value = 'seduce';
+            
+            // Show call screen
+            homeScreen.style.display = 'none';
+            callScreen.style.display = 'flex';
+            callInProgress.style.display = 'none';
+            
+            // Apply seduce theme
+            document.body.classList.add('seduce-theme');
+            isSeduceMode = true;
+            
+            // Play seductive ringtone
+            playRingtone();
+            
+            showNotification("Seduce call started! Show this to someone special...");
+        }
+        
+        // Start a prank call
+        function startPrankCall() {
+            // Update caller info from inputs
+            updateCallerInfo();
+            updateCallerPhoto();
+            updateCallType();
+            
+            // Show call screen
+            homeScreen.style.display = 'none';
+            callScreen.style.display = 'flex';
+            callInProgress.style.display = 'none';
+            
+            // Reset seduce mode
+            isSeduceMode = false;
+            document.body.classList.remove('seduce-theme');
+            
+            // Play ringtone if not silent
+            const ringtone = ringtoneSelect.value;
+            if (ringtone !== 'vibrate') {
+                playRingtone();
+            }
+            
+            showNotification("Prank call started! Show the iPhone to your friend.");
+        }
+        
+        // Play ringtone based on selection
+        function playRingtone() {
+            // Stop any existing ringtone
+            if (ringtoneAudio) {
+                ringtoneAudio.pause();
+                ringtoneAudio.currentTime = 0;
+            }
+            
+            const ringtone = ringtoneSelect.value;
+            
+            // Handle custom audio
+            if (ringtone === 'custom' && customAudioFile) {
+                const url = URL.createObjectURL(customAudioFile);
+                ringtoneAudio = new Audio(url);
+                ringtoneAudio.loop = true;
+                ringtoneAudio.play();
+                return;
+            }
+            
+            // Create audio context for generated tones
+            const audioContext = new (window.AudioContext || window.webkitAudioContext)();
+            const oscillator = audioContext.createOscillator();
+            const gainNode = audioContext.createGain();
+            
+            oscillator.connect(gainNode);
+            gainNode.connect(audioContext.destination);
+            
+            // Different tones based on selection
+            if (ringtone === 'seduce' || ringtone === 'romantic') {
+                // Seductive/romantic tone - soft, pulsating
+                oscillator.type = 'sine';
+                
+                // Create a romantic, pulsating pattern
+                gainNode.gain.setValueAtTime(0, audioContext.currentTime);
+                
+                for (let i = 0; i < 15; i++) {
+                    const startTime = audioContext.currentTime + i * 2.5;
+                    // Soft rise
+                    gainNode.gain.linearRampToValueAtTime(0.2, startTime + 0.3);
+                    // Hold
+                    gainNode.gain.linearRampToValueAtTime(0.2, startTime + 1.5);
+                    // Soft fall
+                    gainNode.gain.linearRampToValueAtTime(0, startTime + 1.8);
+                }
+                
+                oscillator.frequency.setValueAtTime(523.25, audioContext.currentTime); // C5
+            } else {
+                // Default iPhone-like ringtone
+                oscillator.type = 'sine';
+                oscillator.frequency.setValueAtTime(800, audioContext.currentTime);
+                
+                // Create a ringing pattern
+                gainNode.gain.setValueAtTime(0, audioContext.currentTime);
+                
+                // Ring pattern: sound for 1s, silent for 2s
+                for (let i = 0; i < 10; i++) {
+                    const startTime = audioContext.currentTime + i * 3;
+                    gainNode.gain.linearRampToValueAtTime(0.3, startTime + 0.1);
+                    gainNode.gain.linearRampToValueAtTime(0, startTime + 0.9);
+                }
+            }
+            
+            oscillator.start();
+            
+            // Store reference to stop later
+            ringtoneAudio = {
+                stop: function() {
+                    oscillator.stop();
+                    audioContext.close();
+                }
+            };
+            
+            // Auto-stop after 30 seconds
+            setTimeout(() => {
+                if (ringtoneAudio && ringtoneAudio.stop) {
+                    ringtoneAudio.stop();
+                }
+            }, 30000);
+        }
+        
+        // Accept call
+        function acceptCall() {
+            // Stop ringtone
+            if (ringtoneAudio) {
+                if (ringtoneAudio.stop) {
+                    ringtoneAudio.stop();
+                } else {
+                    ringtoneAudio.pause();
+                    ringtoneAudio.currentTime = 0;
+                }
+                ringtoneAudio = null;
+            }
+            
+            // Show call in progress screen
+            callScreen.style.display = 'none';
+            callInProgress.style.display = 'flex';
+            
+            // Start call timer
+            callTimer = 0;
+            updateCallTimer();
+            
+            if (timerInterval) {
+                clearInterval(timerInterval);
+            }
+            
+            timerInterval = setInterval(() => {
+                callTimer++;
+                updateCallTimer();
+            }, 1000);
+            
+            showNotification("Call accepted! The timer is now running.");
+        }
+        
+        // Decline call
+        function declineCall() {
+            // Stop ringtone
+            if (ringtoneAudio) {
+                if (ringtoneAudio.stop) {
+                    ringtoneAudio.stop();
+                } else {
+                    ringtoneAudio.pause();
+                    ringtoneAudio.currentTime = 0;
+                }
+                ringtoneAudio = null;
+            }
+            
+            // Return to home screen
+            callScreen.style.display = 'none';
+            homeScreen.style.display = 'flex';
+            document.body.classList.remove('seduce-theme');
+            isSeduceMode = false;
+            
+            showNotification("Call declined! Ready for another prank.");
+        }
+        
+        // End call
+        function endCall() {
+            // Stop timer
+            if (timerInterval) {
+                clearInterval(timerInterval);
+                timerInterval = null;
+            }
+            
+            // Return to home screen
+            callInProgress.style.display = 'none';
+            homeScreen.style.display = 'flex';
+            document.body.classList.remove('seduce-theme');
+            isSeduceMode = false;
+            
+            showNotification(`Call ended! Duration: ${formatTime(callTimer)}`);
+        }
+        
+        // Update call timer display
+        function updateCallTimer() {
+            callTimerElement.textContent = formatTime(callTimer);
+        }
+        
+        // Format time as MM:SS
+        function formatTime(seconds) {
+            const mins = Math.floor(seconds / 60);
+            const secs = seconds % 60;
+            return `${mins.toString().padStart(2, '0')}:${secs.toString().padStart(2, '0')}`;
+        }
+        
+        // Initialize the app when the page loads
+        window.addEventListener('DOMContentLoaded', initApp);
+        
+        // Handle fullscreen change events
+        document.addEventListener('fullscreenchange', function() {
+            if (!document.fullscreenElement) {
+                document.body.classList.remove('fullscreen');
+                fullscreenToggle.innerHTML = '<i class="fas fa-expand"></i>';
+                
+                if (window.innerHeight >= 700) {
+                    controlPanel.style.display = 'block';
+                }
+                quickStartButtons.style.display = 'none';
+            }
+        });
+    </script>
+</body>
+</html>
