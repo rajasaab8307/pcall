@@ -2,1073 +2,1518 @@
 <html lang="en">
 <head>
     <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-    <meta name="apple-mobile-web-app-capable" content="yes">
-    <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
-    <meta name="mobile-web-app-capable" content="yes">
-    <title>Fake Call - Incoming Call Simulator</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, viewport-fit=cover">
+    <title>Call Simulator | Realistic Mobile Experience</title>
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
     <style>
+        /* Android 13 / iOS 17 inspired design system */
+        :root {
+            /* iOS 17 Colors */
+            --ios-blue: #007AFF;
+            --ios-green: #34C759;
+            --ios-red: #FF3B30;
+            --ios-gray: #8E8E93;
+            --ios-gray2: #AEAEB2;
+            --ios-gray3: #C7C7CC;
+            --ios-gray4: #D1D1D6;
+            --ios-gray5: #E5E5EA;
+            --ios-gray6: #F2F2F7;
+            --ios-label: #000000;
+            --ios-secondary-label: #3C3C4399;
+            
+            /* Android 13 Colors */
+            --android-primary: #6750A4;
+            --android-secondary: #625B71;
+            --android-tertiary: #7D5260;
+            --android-surface: #FFFBFE;
+            --android-surface-variant: #E7E0EC;
+            --android-outline: #79747E;
+            --android-error: #B3261E;
+            
+            /* Shared */
+            --primary-color: var(--ios-blue);
+            --danger-color: var(--ios-red);
+            --success-color: var(--ios-green);
+            --background: #000000;
+            --surface: #1C1C1E;
+            --text-primary: #FFFFFF;
+            --text-secondary: #98989D;
+            
+            /* Spacing */
+            --spacing-xs: 4px;
+            --spacing-sm: 8px;
+            --spacing-md: 16px;
+            --spacing-lg: 24px;
+            --spacing-xl: 32px;
+            --spacing-xxl: 48px;
+            
+            /* Typography - Web-safe matches for iOS SF Pro and Android Roboto */
+            --font-primary: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Helvetica, Arial, sans-serif;
+            --font-display: system-ui, -apple-system, 'Segoe UI', Roboto, Helvetica, Arial, sans-serif;
+            --font-mono: ui-monospace, 'Cascadia Code', 'Source Code Pro', Menlo, Consolas, 'DejaVu Sans Mono', monospace;
+            
+            /* Effects */
+            --shadow-sm: 0 2px 8px rgba(0, 0, 0, 0.15);
+            --shadow-md: 0 4px 16px rgba(0, 0, 0, 0.2);
+            --shadow-lg: 0 8px 32px rgba(0, 0, 0, 0.25);
+            --blur-bg: saturate(180%) blur(20px);
+        }
+
         * {
             margin: 0;
             padding: 0;
             box-sizing: border-box;
-            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', system-ui, sans-serif;
             -webkit-tap-highlight-color: transparent;
-            -webkit-touch-callout: none;
         }
-        
+
         body {
-            background: #000;
-            color: #fff;
+            font-family: var(--font-primary);
+            background: var(--background);
+            color: var(--text-primary);
             min-height: 100vh;
-            min-height: -webkit-fill-available;
+            display: flex;
+            flex-direction: column;
+            overflow-x: hidden;
+            position: relative;
+            font-size: 17px;
+            line-height: 1.47059;
+            font-weight: 400;
+            letter-spacing: -0.022em;
+        }
+
+        /* iOS Status Bar */
+        .status-bar {
+            position: fixed;
+            top: 0;
+            left: 0;
+            right: 0;
+            height: 44px;
+            background: rgba(0, 0, 0, 0.8);
+            backdrop-filter: var(--blur-bg);
+            -webkit-backdrop-filter: var(--blur-bg);
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding: 0 var(--spacing-md);
+            z-index: 1000;
+            font-size: 15px;
+            font-weight: 600;
+        }
+
+        .status-left, .status-right {
+            display: flex;
+            align-items: center;
+            gap: var(--spacing-sm);
+            width: 60px;
+        }
+
+        .status-center {
+            font-size: 14px;
+            font-weight: 600;
+        }
+
+        .status-right {
+            justify-content: flex-end;
+        }
+
+        /* App Container */
+        .app-container {
+            flex: 1;
+            display: flex;
+            flex-direction: column;
+            max-width: 500px;
+            margin: 44px auto 0;
+            width: 100%;
+            position: relative;
+            min-height: calc(100vh - 44px);
+        }
+
+        /* Main Menu Screen */
+        .main-menu {
+            flex: 1;
+            padding: var(--spacing-lg) var(--spacing-md);
+            display: flex;
+            flex-direction: column;
+            gap: var(--spacing-xl);
+        }
+
+        .menu-header {
+            text-align: center;
+            padding: var(--spacing-xl) 0;
+        }
+
+        .menu-header h1 {
+            font-size: 34px;
+            font-weight: 700;
+            margin-bottom: var(--spacing-sm);
+            background: linear-gradient(135deg, var(--ios-blue), #5856D6);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            background-clip: text;
+        }
+
+        .menu-header p {
+            color: var(--text-secondary);
+            font-size: 15px;
+        }
+
+        /* Menu Grid */
+        .menu-grid {
+            display: grid;
+            grid-template-columns: repeat(2, 1fr);
+            gap: var(--spacing-md);
+        }
+
+        .menu-item {
+            background: var(--surface);
+            border-radius: 18px;
+            padding: var(--spacing-lg);
             display: flex;
             flex-direction: column;
             align-items: center;
-            justify-content: center;
-            padding: 20px;
-            padding-top: env(safe-area-inset-top);
-            padding-bottom: env(safe-area-inset-bottom);
-            padding-left: env(safe-area-inset-left);
-            padding-right: env(safe-area-inset-right);
-            transition: background 0.5s ease;
+            gap: var(--spacing-md);
+            text-decoration: none;
+            transition: transform 0.2s, background-color 0.2s;
+            border: 1px solid rgba(255, 255, 255, 0.08);
         }
-        
-        body.screen-off {
-            background: #000 !important;
+
+        .menu-item:active {
+            transform: scale(0.98);
+            background-color: rgba(255, 255, 255, 0.05);
         }
-        
-        body.screen-off .screen-off-overlay {
-            display: flex !important;
-        }
-        
-        html {
-            height: -webkit-fill-available;
-        }
-        
-        .container {
-            width: 100%;
-            max-width: 500px;
-            text-align: center;
-            transition: opacity 0.5s ease;
-        }
-        
-        body.screen-off .container {
-            opacity: 0;
-        }
-        
-        .header {
-            margin-bottom: 20px;
-        }
-        
-        .header h1 {
-            font-size: 1.8rem;
-            margin-bottom: 8px;
-            background: linear-gradient(to right, #4facfe, #00f2fe);
-            -webkit-background-clip: text;
-            background-clip: text;
-            color: transparent;
-        }
-        
-        .header p {
-            color: #a0a0c0;
-            font-size: 0.95rem;
-        }
-        
-        .call-container {
-            background: rgba(255, 255, 255, 0.05);
-            backdrop-filter: blur(10px);
-            border-radius: 25px;
-            padding: 20px;
-            box-shadow: 0 15px 35px rgba(0, 0, 0, 0.2);
-            border: 1px solid rgba(255, 255, 255, 0.1);
-            margin-bottom: 20px;
-            transition: all 0.3s ease;
-        }
-        
-        .call-info {
-            margin-bottom: 25px;
-        }
-        
-        .caller-photo {
-            width: 140px;
-            height: 140px;
-            border-radius: 50%;
-            margin: 0 auto 20px;
-            overflow: hidden;
-            border: 4px solid rgba(79, 172, 254, 0.3);
-            box-shadow: 0 5px 15px rgba(0, 0, 0, 0.2);
-        }
-        
-        .caller-photo img {
-            width: 100%;
-            height: 100%;
-            object-fit: cover;
-        }
-        
-        .caller-name {
-            font-size: 1.8rem;
-            margin-bottom: 5px;
-            font-weight: 600;
-        }
-        
-        .call-status {
-            font-size: 1.1rem;
-            color: #a0a0c0;
-            margin-bottom: 10px;
-        }
-        
-        .call-timer {
-            font-size: 1.3rem;
-            font-weight: 500;
-            color: #4facfe;
-            display: none;
-        }
-        
-        .call-controls {
-            display: flex;
-            justify-content: center;
-            gap: 30px;
-            margin-top: 25px;
-        }
-        
-        .call-btn {
-            width: 80px;
-            height: 80px;
-            border-radius: 50%;
+
+        .menu-icon {
+            width: 60px;
+            height: 60px;
+            border-radius: 18px;
             display: flex;
             align-items: center;
             justify-content: center;
-            font-size: 2rem;
-            cursor: pointer;
-            transition: all 0.2s ease;
-            border: none;
-            color: white;
+            font-size: 24px;
+            background: rgba(255, 255, 255, 0.1);
         }
-        
-        .accept-btn {
-            background: linear-gradient(135deg, #00b09b, #96c93d);
-            box-shadow: 0 5px 15px rgba(0, 176, 155, 0.3);
-        }
-        
-        .decline-btn {
-            background: linear-gradient(135deg, #ff416c, #ff4b2b);
-            box-shadow: 0 5px 15px rgba(255, 65, 108, 0.3);
-        }
-        
-        .end-btn {
-            background: linear-gradient(135deg, #ff416c, #ff4b2b);
-            box-shadow: 0 5px 15px rgba(255, 65, 108, 0.3);
-            display: none;
-            width: 100px;
-            height: 100px;
-            font-size: 2.5rem;
-        }
-        
-        .call-btn:hover, .call-btn:active {
-            transform: scale(0.95);
-        }
-        
-        .setup-panel {
-            background: rgba(255, 255, 255, 0.05);
-            backdrop-filter: blur(10px);
-            border-radius: 20px;
-            padding: 20px;
-            box-shadow: 0 10px 25px rgba(0, 0, 0, 0.2);
-            border: 1px solid rgba(255, 255, 255, 0.1);
-            margin-top: 15px;
-        }
-        
-        .setup-panel h3 {
-            font-size: 1.3rem;
-            margin-bottom: 15px;
-            color: #4facfe;
-        }
-        
-        .form-group {
-            margin-bottom: 15px;
-            text-align: left;
-        }
-        
-        .form-group label {
-            display: block;
-            margin-bottom: 6px;
-            color: #a0a0c0;
-            font-size: 0.9rem;
-        }
-        
-        .form-control {
-            width: 100%;
-            padding: 12px 15px;
-            background: rgba(255, 255, 255, 0.07);
-            border: 1px solid rgba(255, 255, 255, 0.1);
-            border-radius: 10px;
-            color: white;
-            font-size: 1rem;
-            -webkit-appearance: none;
-        }
-        
-        .form-control:focus {
-            outline: none;
-            border-color: #4facfe;
-        }
-        
-        select.form-control {
-            background-image: url("data:image/svg+xml;charset=UTF-8,%3csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='none' stroke='%234facfe' stroke-width='2' stroke-linecap='round' stroke-linejoin='round'%3e%3cpolyline points='6 9 12 15 18 9'%3e%3c/polyline%3e%3c/svg%3e");
-            background-repeat: no-repeat;
-            background-position: right 15px center;
-            background-size: 16px;
-            padding-right: 40px;
-        }
-        
-        .schedule-btn {
-            background: linear-gradient(135deg, #8a2be2, #4a00e0);
-            color: white;
-            border: none;
-            padding: 16px 25px;
-            border-radius: 12px;
-            font-size: 1.1rem;
+
+        .menu-item h3 {
+            font-size: 17px;
             font-weight: 600;
-            cursor: pointer;
-            transition: all 0.3s ease;
-            width: 100%;
-            margin-top: 10px;
-            -webkit-appearance: none;
+            text-align: center;
         }
-        
-        .schedule-btn:active {
-            transform: scale(0.98);
+
+        .menu-item p {
+            font-size: 13px;
+            color: var(--text-secondary);
+            text-align: center;
         }
-        
-        .scheduled-info {
-            margin-top: 20px;
-            padding: 15px;
-            background: rgba(0, 255, 136, 0.1);
-            border-radius: 10px;
-            display: none;
-        }
-        
-        .instructions {
-            margin-top: 20px;
-            font-size: 0.8rem;
-            color: #a0a0c0;
-            line-height: 1.4;
-            padding: 0 10px;
-        }
-        
-        .ringing-animation {
-            animation: pulse 1.5s infinite;
-        }
-        
-        @keyframes pulse {
-            0% { box-shadow: 0 0 0 0 rgba(79, 172, 254, 0.7); }
-            70% { box-shadow: 0 0 0 20px rgba(79, 172, 254, 0); }
-            100% { box-shadow: 0 0 0 0 rgba(79, 172, 254, 0); }
-        }
-        
-        /* Screen Off Simulation */
-        .screen-off-overlay {
+
+        /* Call Screen */
+        .call-screen {
             position: fixed;
             top: 0;
             left: 0;
             right: 0;
             bottom: 0;
-            background: #000;
+            background: linear-gradient(135deg, #1C1C1E 0%, #000000 100%);
+            z-index: 2000;
             display: none;
             flex-direction: column;
-            align-items: center;
-            justify-content: center;
-            z-index: 1000;
-            color: #666;
+            justify-content: space-between;
+            padding: var(--spacing-xxl) var(--spacing-lg) var(--spacing-lg);
         }
-        
-        .screen-off-time {
-            font-size: 3.5rem;
-            font-weight: 300;
-            margin-bottom: 10px;
-            color: #fff;
+
+        .call-screen.active {
+            display: flex;
+            animation: fadeIn 0.3s ease;
         }
-        
-        .screen-off-date {
-            font-size: 1.2rem;
-            margin-bottom: 30px;
-            color: #888;
+
+        @keyframes fadeIn {
+            from { opacity: 0; }
+            to { opacity: 1; }
         }
-        
-        .screen-off-notification {
-            background: rgba(255, 255, 255, 0.1);
-            border-radius: 15px;
-            padding: 15px;
-            width: 90%;
-            max-width: 350px;
-            backdrop-filter: blur(20px);
-            border: 1px solid rgba(255, 255, 255, 0.1);
-            display: none;
+
+        .caller-info {
+            text-align: center;
+            padding-top: var(--spacing-xl);
         }
-        
-        .screen-off-notification-header {
+
+        .caller-avatar {
+            width: 120px;
+            height: 120px;
+            border-radius: 30px;
+            margin: 0 auto var(--spacing-lg);
+            background: linear-gradient(135deg, var(--ios-blue), #5856D6);
             display: flex;
             align-items: center;
-            margin-bottom: 10px;
+            justify-content: center;
+            font-size: 48px;
+            overflow: hidden;
+            position: relative;
+            border: 3px solid rgba(255, 255, 255, 0.1);
         }
-        
-        .screen-off-notification-icon {
+
+        .caller-avatar img {
+            width: 100%;
+            height: 100%;
+            object-fit: cover;
+        }
+
+        .caller-name {
+            font-size: 36px;
+            font-weight: 600;
+            margin-bottom: var(--spacing-sm);
+            letter-spacing: -0.5px;
+        }
+
+        .call-status {
+            font-size: 20px;
+            color: var(--text-secondary);
+            font-weight: 400;
+        }
+
+        .call-timer {
+            font-size: 28px;
+            font-weight: 400;
+            color: var(--ios-green);
+            font-variant-numeric: tabular-nums;
+            margin-top: var(--spacing-md);
+        }
+
+        /* Call Controls */
+        .call-controls {
+            display: flex;
+            justify-content: center;
+            gap: var(--spacing-xl);
+            padding: var(--spacing-xl) 0;
+        }
+
+        .control-btn {
+            width: 80px;
+            height: 80px;
+            border-radius: 40px;
+            border: none;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 24px;
+            cursor: pointer;
+            transition: transform 0.1s, background-color 0.2s;
+            position: relative;
+        }
+
+        .control-btn:active {
+            transform: scale(0.95);
+        }
+
+        .accept-btn {
+            background: var(--ios-green);
+            color: white;
+            box-shadow: 0 4px 20px rgba(52, 199, 89, 0.3);
+        }
+
+        .decline-btn {
+            background: var(--ios-red);
+            color: white;
+            box-shadow: 0 4px 20px rgba(255, 59, 48, 0.3);
+        }
+
+        .mute-btn {
+            background: rgba(255, 255, 255, 0.1);
+            color: white;
+            position: absolute;
+            top: var(--spacing-lg);
+            right: var(--spacing-lg);
             width: 50px;
             height: 50px;
-            border-radius: 10px;
-            background: linear-gradient(135deg, #4facfe, #00f2fe);
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            font-size: 1.5rem;
-            margin-right: 15px;
+            font-size: 18px;
         }
-        
-        .screen-off-notification-title {
-            font-size: 1.1rem;
-            font-weight: 600;
-        }
-        
-        .screen-off-notification-body {
-            font-size: 0.9rem;
-            color: #ccc;
-        }
-        
-        .tap-to-wake {
-            position: absolute;
-            bottom: 30px;
-            color: #666;
-            font-size: 0.9rem;
-            animation: fadeInOut 2s infinite;
-        }
-        
-        @keyframes fadeInOut {
-            0%, 100% { opacity: 0.5; }
-            50% { opacity: 1; }
-        }
-        
-        /* Wake Screen Button */
-        .wake-screen-btn {
-            background: rgba(255, 255, 255, 0.1);
-            border: none;
-            color: white;
-            padding: 12px 25px;
-            border-radius: 10px;
-            font-size: 1rem;
-            margin-top: 15px;
-            cursor: pointer;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            gap: 10px;
-        }
-        
-        /* Control Panel */
-        .control-panel {
+
+        /* Modal Styles */
+        .modal {
             position: fixed;
-            top: 15px;
-            right: 15px;
-            display: flex;
-            gap: 10px;
-            z-index: 100;
-        }
-        
-        .control-btn {
-            background: rgba(255, 255, 255, 0.1);
-            border: none;
-            color: white;
-            width: 40px;
-            height: 40px;
-            border-radius: 50%;
-            display: flex;
+            top: 0;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            background: rgba(0, 0, 0, 0.8);
+            backdrop-filter: var(--blur-bg);
+            -webkit-backdrop-filter: var(--blur-bg);
+            z-index: 3000;
+            display: none;
             align-items: center;
             justify-content: center;
-            font-size: 1.2rem;
+            padding: var(--spacing-md);
+        }
+
+        .modal.active {
+            display: flex;
+            animation: modalFadeIn 0.3s ease;
+        }
+
+        @keyframes modalFadeIn {
+            from { opacity: 0; }
+            to { opacity: 1; }
+        }
+
+        .modal-content {
+            background: var(--surface);
+            border-radius: 28px;
+            width: 100%;
+            max-width: 400px;
+            max-height: 90vh;
+            overflow: hidden;
+            display: flex;
+            flex-direction: column;
+        }
+
+        .modal-header {
+            padding: var(--spacing-lg) var(--spacing-lg) var(--spacing-md);
+            text-align: center;
+            border-bottom: 1px solid rgba(255, 255, 255, 0.1);
+        }
+
+        .modal-header h2 {
+            font-size: 22px;
+            font-weight: 700;
+        }
+
+        .modal-body {
+            padding: var(--spacing-lg);
+            overflow-y: auto;
+            flex: 1;
+        }
+
+        .modal-footer {
+            padding: var(--spacing-md) var(--spacing-lg);
+            border-top: 1px solid rgba(255, 255, 255, 0.1);
+            display: flex;
+            gap: var(--spacing-md);
+        }
+
+        .btn {
+            flex: 1;
+            padding: var(--spacing-md) var(--spacing-lg);
+            border-radius: 12px;
+            border: none;
+            font-size: 17px;
+            font-weight: 600;
             cursor: pointer;
-            backdrop-filter: blur(10px);
+            transition: opacity 0.2s;
         }
-        
-        /* Alert Styles */
-        .alert {
-            background: rgba(255, 65, 108, 0.1);
-            border: 1px solid rgba(255, 65, 108, 0.3);
-            border-radius: 10px;
-            padding: 15px;
-            margin-bottom: 20px;
-            font-size: 0.9rem;
+
+        .btn:active {
+            opacity: 0.7;
         }
-        
-        /* Mobile-specific optimizations */
-        @media (max-width: 768px) {
-            body {
-                padding: 10px;
-            }
-            
-            .call-container {
-                padding: 15px;
-                border-radius: 20px;
-            }
-            
-            .caller-photo {
-                width: 120px;
-                height: 120px;
+
+        .btn-primary {
+            background: var(--ios-blue);
+            color: white;
+        }
+
+        .btn-secondary {
+            background: rgba(255, 255, 255, 0.1);
+            color: white;
+        }
+
+        /* Form Elements */
+        .form-group {
+            margin-bottom: var(--spacing-lg);
+        }
+
+        .form-group label {
+            display: block;
+            margin-bottom: var(--spacing-sm);
+            color: var(--text-secondary);
+            font-size: 13px;
+            font-weight: 600;
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+        }
+
+        .form-control {
+            width: 100%;
+            padding: var(--spacing-md) var(--spacing-lg);
+            background: rgba(255, 255, 255, 0.05);
+            border: 1px solid rgba(255, 255, 255, 0.1);
+            border-radius: 12px;
+            color: var(--text-primary);
+            font-size: 17px;
+            font-family: var(--font-primary);
+        }
+
+        .form-control:focus {
+            outline: none;
+            border-color: var(--ios-blue);
+        }
+
+        /* Ringtone/Call Audio Selection */
+        .audio-options {
+            display: flex;
+            flex-direction: column;
+            gap: var(--spacing-sm);
+            max-height: 300px;
+            overflow-y: auto;
+        }
+
+        .audio-option {
+            display: flex;
+            align-items: center;
+            padding: var(--spacing-md);
+            background: rgba(255, 255, 255, 0.05);
+            border-radius: 12px;
+            cursor: pointer;
+            transition: background-color 0.2s;
+        }
+
+        .audio-option:hover, .audio-option.active {
+            background: rgba(255, 255, 255, 0.1);
+        }
+
+        .audio-option i {
+            margin-right: var(--spacing-md);
+            font-size: 20px;
+            color: var(--ios-blue);
+            width: 24px;
+            text-align: center;
+        }
+
+        .audio-info {
+            flex: 1;
+        }
+
+        .audio-name {
+            font-weight: 600;
+            margin-bottom: 2px;
+        }
+
+        .audio-duration {
+            font-size: 13px;
+            color: var(--text-secondary);
+        }
+
+        /* Schedule Picker */
+        .schedule-grid {
+            display: grid;
+            grid-template-columns: repeat(3, 1fr);
+            gap: var(--spacing-sm);
+            margin-top: var(--spacing-md);
+        }
+
+        .schedule-option {
+            padding: var(--spacing-md);
+            background: rgba(255, 255, 255, 0.05);
+            border-radius: 12px;
+            text-align: center;
+            cursor: pointer;
+            transition: background-color 0.2s;
+        }
+
+        .schedule-option.active {
+            background: var(--ios-blue);
+            color: white;
+        }
+
+        /* Flash effect for vibration simulation */
+        .flash-effect {
+            position: fixed;
+            top: 0;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            background: white;
+            opacity: 0;
+            pointer-events: none;
+            z-index: 4000;
+        }
+
+        .flash-effect.active {
+            animation: flash 0.1s ease;
+        }
+
+        @keyframes flash {
+            0% { opacity: 0; }
+            50% { opacity: 0.3; }
+            100% { opacity: 0; }
+        }
+
+        /* Notification */
+        .notification {
+            position: fixed;
+            top: 60px;
+            left: 50%;
+            transform: translateX(-50%);
+            background: var(--surface);
+            border-radius: 12px;
+            padding: var(--spacing-md) var(--spacing-lg);
+            display: flex;
+            align-items: center;
+            gap: var(--spacing-md);
+            box-shadow: var(--shadow-lg);
+            z-index: 2500;
+            opacity: 0;
+            transition: opacity 0.3s, transform 0.3s;
+            max-width: 90%;
+        }
+
+        .notification.active {
+            opacity: 1;
+            transform: translateX(-50%) translateY(0);
+        }
+
+        .notification i {
+            color: var(--ios-green);
+            font-size: 20px;
+        }
+
+        /* Responsive */
+        @media (max-width: 375px) {
+            .menu-grid {
+                grid-template-columns: 1fr;
             }
             
             .caller-name {
-                font-size: 1.6rem;
+                font-size: 28px;
             }
             
-            .call-btn {
+            .control-btn {
                 width: 70px;
                 height: 70px;
-                font-size: 1.7rem;
-            }
-            
-            .end-btn {
-                width: 85px;
-                height: 85px;
-                font-size: 2rem;
-            }
-            
-            .call-controls {
-                gap: 25px;
-            }
-            
-            .setup-panel {
-                padding: 15px;
             }
         }
-        
-        @media (max-width: 480px) {
-            .header h1 {
-                font-size: 1.5rem;
+
+        @media (min-width: 768px) {
+            .app-container {
+                margin-top: 60px;
+                min-height: calc(100vh - 60px);
             }
             
-            .caller-photo {
-                width: 110px;
-                height: 110px;
-            }
-            
-            .caller-name {
-                font-size: 1.5rem;
-            }
-            
-            .call-btn {
-                width: 65px;
-                height: 65px;
-                font-size: 1.5rem;
-            }
-            
-            .end-btn {
-                width: 80px;
-                height: 80px;
-                font-size: 1.8rem;
-            }
-            
-            .call-controls {
-                gap: 20px;
-            }
-            
-            .form-control, .schedule-btn {
-                padding: 14px;
+            .status-bar {
+                height: 60px;
             }
         }
-        
-        /* Prevent text selection */
-        .noselect {
-            -webkit-touch-callout: none;
-            -webkit-user-select: none;
-            -khtml-user-select: none;
-            -moz-user-select: none;
-            -ms-user-select: none;
-            user-select: none;
+
+        /* Hide scrollbar but keep functionality */
+        ::-webkit-scrollbar {
+            width: 0;
+            background: transparent;
         }
     </style>
 </head>
-<body class="noselect">
-    <!-- Screen Off Simulation Overlay -->
-    <div class="screen-off-overlay" id="screenOffOverlay">
-        <div class="screen-off-time" id="screenOffTime">12:00</div>
-        <div class="screen-off-date" id="screenOffDate">Monday, January 1</div>
-        
-        <div class="screen-off-notification" id="screenOffNotification">
-            <div class="screen-off-notification-header">
-                <div class="screen-off-notification-icon">
-                    <i class="fas fa-phone-alt"></i>
-                </div>
-                <div>
-                    <div class="screen-off-notification-title" id="notificationTitle">Incoming Call</div>
-                    <div class="screen-off-notification-body" id="notificationBody">Tap to view</div>
-                </div>
-            </div>
+<body>
+    <!-- Status Bar (iOS Style) -->
+    <div class="status-bar">
+        <div class="status-left">
+            <span>9:41</span>
         </div>
-        
-        <div class="tap-to-wake">Tap screen to wake</div>
-    </div>
-    
-    <!-- Control Panel -->
-    <div class="control-panel">
-        <button class="control-btn" id="screenOffBtn" title="Simulate Screen Off">
-            <i class="fas fa-power-off"></i>
-        </button>
-        <button class="control-btn" id="fullscreenBtn" title="Toggle Fullscreen">
-            <i class="fas fa-expand"></i>
-        </button>
-    </div>
-    
-    <div class="container">
-        <div class="alert">
-            <i class="fas fa-info-circle"></i> 
-            <strong>Important:</strong> This is a simulation. Real phone screens cannot be controlled by web apps due to security restrictions.
-        </div>
-        
-        <div class="header">
-            <h1><i class="fas fa-phone-alt"></i> Fake Call</h1>
-            <p>Simulate an incoming call with screen-off simulation</p>
-        </div>
-        
-        <div class="call-container">
-            <div class="call-info">
-                <div class="caller-photo" id="callerPhoto">
-                    <img src="https://images.unsplash.com/photo-1535713875002-d1d0cf377fde?ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D&auto=format&fit=crop&w=500&q=80" alt="Caller Photo" id="photoImg">
-                </div>
-                <h2 class="caller-name" id="callerName">John Smith</h2>
-                <div class="call-status" id="callStatus">Ready for fake call</div>
-                <div class="call-timer" id="callTimer">00:00</div>
-            </div>
-            
-            <div class="call-controls">
-                <button class="call-btn accept-btn" id="acceptBtn">
-                    <i class="fas fa-phone"></i>
-                </button>
-                <button class="call-btn decline-btn" id="declineBtn">
-                    <i class="fas fa-phone-slash"></i>
-                </button>
-                <button class="call-btn end-btn" id="endBtn">
-                    <i class="fas fa-phone-slash"></i>
-                </button>
-            </div>
-        </div>
-        
-        <div class="setup-panel">
-            <h3><i class="fas fa-cogs"></i> Customize Your Call</h3>
-            
-            <div class="form-group">
-                <label for="callerNameInput"><i class="fas fa-user"></i> Caller Name</label>
-                <input type="text" id="callerNameInput" class="form-control" value="John Smith" placeholder="Enter caller name">
-            </div>
-            
-            <div class="form-group">
-                <label for="callerPhotoSelect"><i class="fas fa-image"></i> Caller Photo</label>
-                <select id="callerPhotoSelect" class="form-control">
-                    <option value="https://images.unsplash.com/photo-1535713875002-d1d0cf377fde?ixlib=rb-4.0.3&auto=format&fit=crop&w=500&q=80">Business Person</option>
-                    <option value="https://images.unsplash.com/photo-1494790108755-2616b612b786?ixlib=rb-4.0.3&auto=format&fit=crop&w=500&q=80">Woman Smiling</option>
-                    <option value="https://images.unsplash.com/photo-1507003211169-0a1dd7228f2d?ixlib=rb-4.0.3&auto=format&fit=crop&w=500&q=80">Man with Glasses</option>
-                    <option value="https://images.unsplash.com/photo-1438761681033-6461ffad8d80?ixlib=rb-4.0.3&auto=format&fit=crop&w=500&q=80">Woman at Desk</option>
-                </select>
-            </div>
-            
-            <div class="form-group">
-                <label for="callType"><i class="fas fa-phone"></i> Call Type</label>
-                <select id="callType" class="form-control">
-                    <option value="normal">Normal Call</option>
-                    <option value="emergency">Emergency Call</option>
-                    <option value="boss">Boss Calling</option>
-                    <option value="friend">Friend Calling</option>
-                </select>
-            </div>
-            
-            <div class="form-group">
-                <label for="delayTime"><i class="fas fa-clock"></i> Schedule Call (seconds)</label>
-                <input type="range" id="delayTime" class="form-control" min="5" max="60" value="10">
-                <div style="display: flex; justify-content: space-between; margin-top: 5px;">
-                    <span>5s</span>
-                    <span id="delayValue">10s</span>
-                    <span>60s</span>
-                </div>
-            </div>
-            
-            <div class="form-group">
-                <label>
-                    <input type="checkbox" id="simulateScreenOff" checked> Simulate screen-off effect
-                </label>
-            </div>
-            
-            <button class="schedule-btn" id="scheduleBtn">
-                <i class="fas fa-play-circle"></i> Start Fake Call with Screen-Off Simulation
-            </button>
-            
-            <button class="wake-screen-btn" id="wakeScreenBtn">
-                <i class="fas fa-bell"></i> Test Wake Notification
-            </button>
-            
-            <div class="scheduled-info" id="scheduledInfo">
-                <i class="fas fa-clock"></i> Fake call scheduled in <span id="countdown">10</span> seconds
-            </div>
-        </div>
-        
-        <div class="instructions">
-            <p><i class="fas fa-lightbulb"></i> <strong>How it works:</strong> Set up your call, then use the power button to simulate screen off. When the call comes, you'll see a notification on the "sleeping" screen. Tap to "wake" and answer.</p>
+        <div class="status-center">Call Simulator</div>
+        <div class="status-right">
+            <i class="fas fa-signal"></i>
+            <i class="fas fa-wifi"></i>
+            <i class="fas fa-battery-full"></i>
         </div>
     </div>
 
-    <audio id="ringtoneAudio" loop>
-        <source src="https://assets.mixkit.co/sfx/preview/mixkit-classic-phone-ring-449.mp3" type="audio/mpeg">
-    </audio>
-    
-    <audio id="notificationSound">
-        <source src="https://assets.mixkit.co/sfx/preview/mixkit-retro-game-emergency-alarm-1000.mp3" type="audio/mpeg">
-    </audio>
-    
-    <audio id="callConnectedAudio">
-        <source src="https://assets.mixkit.co/sfx/preview/mixkit-phone-call-connected-1066.mp3" type="audio/mpeg">
-    </audio>
-    
-    <audio id="callEndedAudio">
-        <source src="https://assets.mixkit.co/sfx/preview/mixkit-hanging-up-on-a-call-485.mp3" type="audio/mpeg">
-    </audio>
+    <!-- Main App Container -->
+    <div class="app-container">
+        <!-- Main Menu -->
+        <div class="main-menu" id="mainMenu">
+            <div class="menu-header">
+                <h1>Call Simulator</h1>
+                <p>Realistic phone call experience with custom settings</p>
+            </div>
+            
+            <div class="menu-grid">
+                <div class="menu-item" id="startCallBtn">
+                    <div class="menu-icon" style="background: rgba(52, 199, 89, 0.2); color: var(--ios-green);">
+                        <i class="fas fa-phone"></i>
+                    </div>
+                    <h3>Start Call</h3>
+                    <p>Initiate a simulated incoming call</p>
+                </div>
+                
+                <div class="menu-item" id="settingsBtn">
+                    <div class="menu-icon" style="background: rgba(0, 122, 255, 0.2); color: var(--ios-blue);">
+                        <i class="fas fa-sliders-h"></i>
+                    </div>
+                    <h3>Settings</h3>
+                    <p>Configure ringtone, audio & preferences</p>
+                </div>
+                
+                <div class="menu-item" id="callerBtn">
+                    <div class="menu-icon" style="background: rgba(255, 149, 0, 0.2); color: #FF9500;">
+                        <i class="fas fa-user-friends"></i>
+                    </div>
+                    <h3>Caller Profile</h3>
+                    <p>Set caller name, photo & info</p>
+                </div>
+                
+                <div class="menu-item" id="scheduleBtn">
+                    <div class="menu-icon" style="background: rgba(175, 82, 222, 0.2); color: #AF52DE;">
+                        <i class="fas fa-clock"></i>
+                    </div>
+                    <h3>Schedule Call</h3>
+                    <p>Set up a future incoming call</p>
+                </div>
+            </div>
+            
+            <div style="text-align: center; margin-top: auto; padding-top: var(--spacing-xl); color: var(--text-secondary); font-size: 13px;">
+                <p>Tap "Start Call" to begin simulation</p>
+                <p style="margin-top: var(--spacing-xs);">Adjust volume for realistic experience</p>
+            </div>
+        </div>
+    </div>
+
+    <!-- Call Screen -->
+    <div class="call-screen" id="callScreen">
+        <button class="control-btn mute-btn" id="muteBtn" style="display: none;">
+            <i class="fas fa-microphone-slash"></i>
+        </button>
+        
+        <div class="caller-info">
+            <div class="caller-avatar" id="callerAvatar">
+                <i class="fas fa-user"></i>
+            </div>
+            <div class="caller-name" id="callerName">John Smith</div>
+            <div class="call-status" id="callStatus">Incoming call...</div>
+            <div class="call-timer" id="callTimer" style="display: none;">00:00</div>
+        </div>
+        
+        <div class="call-controls">
+            <button class="control-btn decline-btn" id="declineCallBtn">
+                <i class="fas fa-phone-slash"></i>
+            </button>
+            <button class="control-btn accept-btn" id="acceptCallBtn">
+                <i class="fas fa-phone"></i>
+            </button>
+        </div>
+    </div>
+
+    <!-- Settings Modal -->
+    <div class="modal" id="settingsModal">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h2>Call Settings</h2>
+            </div>
+            <div class="modal-body">
+                <div class="form-group">
+                    <label>Ringtone</label>
+                    <div class="audio-options" id="ringtoneOptions">
+                        <!-- Ringtone options will be populated by JS -->
+                    </div>
+                </div>
+                
+                <div class="form-group">
+                    <label>Call Background Audio</label>
+                    <div class="audio-options" id="callAudioOptions">
+                        <!-- Call audio options will be populated by JS -->
+                    </div>
+                </div>
+                
+                <div class="form-group">
+                    <label>Effects</label>
+                    <div style="display: flex; gap: var(--spacing-md);">
+                        <label style="flex: 1; display: flex; align-items: center; gap: var(--spacing-sm);">
+                            <input type="checkbox" id="vibrationToggle" checked>
+                            <span>Vibration</span>
+                        </label>
+                        <label style="flex: 1; display: flex; align-items: center; gap: var(--spacing-sm);">
+                            <input type="checkbox" id="flashToggle" checked>
+                            <span>Screen Flash</span>
+                        </label>
+                    </div>
+                </div>
+                
+                <div class="form-group">
+                    <label>Ringtone Volume</label>
+                    <input type="range" min="0" max="100" value="70" class="form-control" id="ringtoneVolume">
+                </div>
+                
+                <div class="form-group">
+                    <label>Call Audio Volume</label>
+                    <input type="range" min="0" max="100" value="30" class="form-control" id="callVolume">
+                </div>
+            </div>
+            <div class="modal-footer">
+                <button class="btn btn-secondary" id="closeSettingsBtn">Cancel</button>
+                <button class="btn btn-primary" id="saveSettingsBtn">Save</button>
+            </div>
+        </div>
+    </div>
+
+    <!-- Caller Profile Modal -->
+    <div class="modal" id="callerModal">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h2>Caller Profile</h2>
+            </div>
+            <div class="modal-body">
+                <div class="form-group" style="text-align: center;">
+                    <div class="caller-avatar" id="profileAvatar" style="width: 100px; height: 100px; margin: 0 auto var(--spacing-lg); cursor: pointer;">
+                        <i class="fas fa-user"></i>
+                    </div>
+                    <input type="file" id="avatarUpload" accept="image/*" style="display: none;">
+                    <button class="btn btn-secondary" id="changePhotoBtn" style="width: auto; padding: var(--spacing-sm) var(--spacing-md);">
+                        <i class="fas fa-camera"></i> Change Photo
+                    </button>
+                </div>
+                
+                <div class="form-group">
+                    <label>Caller Name</label>
+                    <input type="text" class="form-control" id="callerNameInput" value="John Smith" placeholder="Enter caller name">
+                </div>
+                
+                <div class="form-group">
+                    <label>Phone Number</label>
+                    <input type="tel" class="form-control" id="callerNumberInput" value="+1 (555) 123-4567" placeholder="Enter phone number">
+                </div>
+                
+                <div class="form-group">
+                    <label>Call Type</label>
+                    <select class="form-control" id="callTypeInput">
+                        <option value="mobile">Mobile</option>
+                        <option value="home">Home</option>
+                        <option value="work">Work</option>
+                        <option value="unknown">Unknown</option>
+                    </select>
+                </div>
+            </div>
+            <div class="modal-footer">
+                <button class="btn btn-secondary" id="closeCallerBtn">Cancel</button>
+                <button class="btn btn-primary" id="saveCallerBtn">Save</button>
+            </div>
+        </div>
+    </div>
+
+    <!-- Schedule Modal -->
+    <div class="modal" id="scheduleModal">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h2>Schedule Call</h2>
+            </div>
+            <div class="modal-body">
+                <div class="form-group">
+                    <label>Schedule Time</label>
+                    <input type="datetime-local" class="form-control" id="scheduleTime">
+                </div>
+                
+                <div class="form-group">
+                    <label>Quick Schedule</label>
+                    <div class="schedule-grid">
+                        <div class="schedule-option" data-minutes="5">5 min</div>
+                        <div class="schedule-option" data-minutes="10">10 min</div>
+                        <div class="schedule-option" data-minutes="15">15 min</div>
+                        <div class="schedule-option" data-minutes="30">30 min</div>
+                        <div class="schedule-option" data-minutes="60">1 hour</div>
+                        <div class="schedule-option" data-minutes="120">2 hours</div>
+                    </div>
+                </div>
+                
+                <div class="form-group">
+                    <div id="scheduleInfo" style="background: rgba(255, 149, 0, 0.1); padding: var(--spacing-md); border-radius: 12px; font-size: 14px; display: none;">
+                        <i class="fas fa-clock" style="color: #FF9500; margin-right: var(--spacing-sm);"></i>
+                        <span id="scheduleText"></span>
+                    </div>
+                </div>
+            </div>
+            <div class="modal-footer">
+                <button class="btn btn-secondary" id="closeScheduleBtn">Cancel</button>
+                <button class="btn btn-primary" id="saveScheduleBtn">Schedule</button>
+            </div>
+        </div>
+    </div>
+
+    <!-- Flash Effect -->
+    <div class="flash-effect" id="flashEffect"></div>
+
+    <!-- Notification -->
+    <div class="notification" id="notification">
+        <i class="fas fa-check-circle"></i>
+        <span>Call scheduled successfully</span>
+    </div>
+
+    <!-- Audio Elements -->
+    <audio id="ringtoneAudio" preload="auto" loop></audio>
+    <audio id="callAudio" preload="auto" loop></audio>
 
     <script>
+        // App State
+        const appState = {
+            isCallActive: false,
+            isRinging: false,
+            isInCall: false,
+            callStartTime: null,
+            timerInterval: null,
+            vibrationInterval: null,
+            flashInterval: null,
+            scheduledCallTimeout: null,
+            selectedRingtone: 'classic',
+            selectedCallAudio: 'conversation',
+            ringtoneVolume: 0.7,
+            callVolume: 0.3,
+            vibrationEnabled: true,
+            flashEnabled: true,
+            callerProfile: {
+                name: 'John Smith',
+                number: '+1 (555) 123-4567',
+                type: 'mobile',
+                avatar: null
+            }
+        };
+
+        // Audio Data
+        const audioData = {
+            ringtones: [
+                { id: 'classic', name: 'Classic Ringtone', icon: 'fa-bell', duration: '4s' },
+                { id: 'digital', name: 'Digital Beep', icon: 'fa-wave-square', duration: '3s' },
+                { id: 'melody', name: 'Simple Melody', icon: 'fa-music', duration: '5s' },
+                { id: 'pulse', name: 'Pulse Ring', icon: 'fa-heartbeat', duration: '3s' },
+                { id: 'echo', name: 'Echo Ring', icon: 'fa-echo', duration: '4s' }
+            ],
+            callAudio: [
+                { id: 'conversation', name: 'Conversation', icon: 'fa-comments', duration: 'Loop' },
+                { id: 'cafe', name: 'Cafe Background', icon: 'fa-coffee', duration: 'Loop' },
+                { id: 'street', name: 'Street Noise', icon: 'fa-car', duration: 'Loop' },
+                { id: 'office', name: 'Office Ambience', icon: 'fa-building', duration: 'Loop' },
+                { id: 'nature', name: 'Nature Sounds', icon: 'fa-tree', duration: 'Loop' }
+            ]
+        };
+
         // DOM Elements
-        const acceptBtn = document.getElementById('acceptBtn');
-        const declineBtn = document.getElementById('declineBtn');
-        const endBtn = document.getElementById('endBtn');
-        const scheduleBtn = document.getElementById('scheduleBtn');
-        const callerName = document.getElementById('callerName');
-        const callStatus = document.getElementById('callStatus');
-        const callTimer = document.getElementById('callTimer');
-        const callerPhoto = document.getElementById('callerPhoto');
-        const photoImg = document.getElementById('photoImg');
-        const callerNameInput = document.getElementById('callerNameInput');
-        const callerPhotoSelect = document.getElementById('callerPhotoSelect');
-        const delayTime = document.getElementById('delayTime');
-        const delayValue = document.getElementById('delayValue');
-        const scheduledInfo = document.getElementById('scheduledInfo');
-        const countdown = document.getElementById('countdown');
-        const screenOffBtn = document.getElementById('screenOffBtn');
-        const fullscreenBtn = document.getElementById('fullscreenBtn');
-        const screenOffOverlay = document.getElementById('screenOffOverlay');
-        const screenOffTime = document.getElementById('screenOffTime');
-        const screenOffDate = document.getElementById('screenOffDate');
-        const screenOffNotification = document.getElementById('screenOffNotification');
-        const notificationTitle = document.getElementById('notificationTitle');
-        const notificationBody = document.getElementById('notificationBody');
-        const wakeScreenBtn = document.getElementById('wakeScreenBtn');
-        const callType = document.getElementById('callType');
-        const simulateScreenOffCheckbox = document.getElementById('simulateScreenOff');
-        
-        // Audio elements
-        const ringtoneAudio = document.getElementById('ringtoneAudio');
-        const notificationSound = document.getElementById('notificationSound');
-        const callConnectedAudio = document.getElementById('callConnectedAudio');
-        const callEndedAudio = document.getElementById('callEndedAudio');
-        
-        // State variables
-        let callActive = false;
-        let callAnswered = false;
-        let screenOff = false;
-        let callTimerInterval;
-        let seconds = 0;
-        let minutes = 0;
-        let scheduledTimeout;
-        let countdownInterval;
-        let screenOffTimeout;
-        
-        // Initialize time display
-        function updateTimeDisplay() {
-            const now = new Date();
-            const timeString = now.toLocaleTimeString([], {hour: '2-digit', minute:'2-digit'});
-            const dateString = now.toLocaleDateString([], {weekday: 'long', month: 'long', day: 'numeric'});
+        const elements = {
+            mainMenu: document.getElementById('mainMenu'),
+            callScreen: document.getElementById('callScreen'),
+            callerName: document.getElementById('callerName'),
+            callerAvatar: document.getElementById('callerAvatar'),
+            profileAvatar: document.getElementById('profileAvatar'),
+            callStatus: document.getElementById('callStatus'),
+            callTimer: document.getElementById('callTimer'),
+            startCallBtn: document.getElementById('startCallBtn'),
+            settingsBtn: document.getElementById('settingsBtn'),
+            callerBtn: document.getElementById('callerBtn'),
+            scheduleBtn: document.getElementById('scheduleBtn'),
+            acceptCallBtn: document.getElementById('acceptCallBtn'),
+            declineCallBtn: document.getElementById('declineCallBtn'),
+            muteBtn: document.getElementById('muteBtn'),
+            settingsModal: document.getElementById('settingsModal'),
+            callerModal: document.getElementById('callerModal'),
+            scheduleModal: document.getElementById('scheduleModal'),
+            ringtoneOptions: document.getElementById('ringtoneOptions'),
+            callAudioOptions: document.getElementById('callAudioOptions'),
+            vibrationToggle: document.getElementById('vibrationToggle'),
+            flashToggle: document.getElementById('flashToggle'),
+            ringtoneVolume: document.getElementById('ringtoneVolume'),
+            callVolume: document.getElementById('callVolume'),
+            closeSettingsBtn: document.getElementById('closeSettingsBtn'),
+            saveSettingsBtn: document.getElementById('saveSettingsBtn'),
+            closeCallerBtn: document.getElementById('closeCallerBtn'),
+            saveCallerBtn: document.getElementById('saveCallerBtn'),
+            closeScheduleBtn: document.getElementById('closeScheduleBtn'),
+            saveScheduleBtn: document.getElementById('saveScheduleBtn'),
+            callerNameInput: document.getElementById('callerNameInput'),
+            callerNumberInput: document.getElementById('callerNumberInput'),
+            callTypeInput: document.getElementById('callTypeInput'),
+            changePhotoBtn: document.getElementById('changePhotoBtn'),
+            avatarUpload: document.getElementById('avatarUpload'),
+            scheduleTime: document.getElementById('scheduleTime'),
+            scheduleInfo: document.getElementById('scheduleInfo'),
+            scheduleText: document.getElementById('scheduleText'),
+            flashEffect: document.getElementById('flashEffect'),
+            notification: document.getElementById('notification'),
+            ringtoneAudio: document.getElementById('ringtoneAudio'),
+            callAudio: document.getElementById('callAudio')
+        };
+
+        // Initialize App
+        function initApp() {
+            // Set default schedule time to now + 5 minutes
+            const defaultTime = new Date();
+            defaultTime.setMinutes(defaultTime.getMinutes() + 5);
+            elements.scheduleTime.value = formatDateTimeLocal(defaultTime);
             
-            screenOffTime.textContent = timeString;
-            screenOffDate.textContent = dateString;
+            // Populate audio options
+            populateAudioOptions();
+            
+            // Load saved settings
+            loadSettings();
+            
+            // Initialize audio
+            initAudio();
+            
+            // Set up event listeners
+            setupEventListeners();
         }
-        
-        // Update time every minute
-        setInterval(updateTimeDisplay, 60000);
-        updateTimeDisplay();
-        
-        // Toggle screen off simulation
-        screenOffBtn.addEventListener('click', function() {
-            screenOff = !screenOff;
+
+        // Populate audio selection options
+        function populateAudioOptions() {
+            // Ringtone options
+            audioData.ringtones.forEach(rt => {
+                const option = document.createElement('div');
+                option.className = `audio-option ${rt.id === appState.selectedRingtone ? 'active' : ''}`;
+                option.dataset.id = rt.id;
+                option.innerHTML = `
+                    <i class="fas ${rt.icon}"></i>
+                    <div class="audio-info">
+                        <div class="audio-name">${rt.name}</div>
+                        <div class="audio-duration">${rt.duration}</div>
+                    </div>
+                    ${rt.id === appState.selectedRingtone ? '<i class="fas fa-check" style="color: var(--ios-blue);"></i>' : ''}
+                `;
+                option.addEventListener('click', () => selectRingtone(rt.id));
+                elements.ringtoneOptions.appendChild(option);
+            });
+
+            // Call audio options
+            audioData.callAudio.forEach(ca => {
+                const option = document.createElement('div');
+                option.className = `audio-option ${ca.id === appState.selectedCallAudio ? 'active' : ''}`;
+                option.dataset.id = ca.id;
+                option.innerHTML = `
+                    <i class="fas ${ca.icon}"></i>
+                    <div class="audio-info">
+                        <div class="audio-name">${ca.name}</div>
+                        <div class="audio-duration">${ca.duration}</div>
+                    </div>
+                    ${ca.id === appState.selectedCallAudio ? '<i class="fas fa-check" style="color: var(--ios-blue);"></i>' : ''}
+                `;
+                option.addEventListener('click', () => selectCallAudio(ca.id));
+                elements.callAudioOptions.appendChild(option);
+            });
+        }
+
+        // Initialize Web Audio API
+        function initAudio() {
+            // Create Audio Context
+            const AudioContext = window.AudioContext || window.webkitAudioContext;
+            if (AudioContext) {
+                // Web Audio API is supported
+                // We'll use it for more precise control if needed
+            }
             
-            if (screenOff) {
-                document.body.classList.add('screen-off');
-                screenOffBtn.innerHTML = '<i class="fas fa-power-on"></i>';
-                screenOffBtn.title = 'Turn Screen On';
-                
-                // Show notification after a delay if call is scheduled
-                if (scheduledTimeout) {
-                    setTimeout(showWakeNotification, 2000);
+            // Set initial volumes
+            updateAudioVolumes();
+        }
+
+        // Update audio volumes
+        function updateAudioVolumes() {
+            elements.ringtoneAudio.volume = appState.ringtoneVolume;
+            elements.callAudio.volume = appState.callVolume;
+        }
+
+        // Select ringtone
+        function selectRingtone(id) {
+            appState.selectedRingtone = id;
+            
+            // Update UI
+            document.querySelectorAll('#ringtoneOptions .audio-option').forEach(opt => {
+                opt.classList.toggle('active', opt.dataset.id === id);
+                const checkIcon = opt.querySelector('.fa-check');
+                if (checkIcon) {
+                    checkIcon.style.display = opt.dataset.id === id ? 'block' : 'none';
                 }
-            } else {
-                document.body.classList.remove('screen-off');
-                screenOffBtn.innerHTML = '<i class="fas fa-power-off"></i>';
-                screenOffBtn.title = 'Simulate Screen Off';
-                hideWakeNotification();
-            }
-        });
-        
-        // Wake screen when tapping on screen off overlay
-        screenOffOverlay.addEventListener('click', function(e) {
-            if (screenOff && e.target.closest('.screen-off-notification')) {
-                // If tapping on notification, wake screen immediately
-                wakeScreen();
-                if (callActive) {
-                    // If call is active, show it immediately
-                    showIncomingCall();
-                }
-            } else if (screenOff) {
-                // If tapping anywhere else, just wake screen
-                wakeScreen();
-            }
-        });
-        
-        // Test wake notification
-        wakeScreenBtn.addEventListener('click', function() {
-            if (!screenOff) {
-                // First turn screen off
-                screenOff = true;
-                document.body.classList.add('screen-off');
-                screenOffBtn.innerHTML = '<i class="fas fa-power-on"></i>';
-                
-                setTimeout(() => {
-                    showWakeNotification();
-                }, 1000);
-            } else {
-                showWakeNotification();
-            }
-        });
-        
-        // Show wake notification
-        function showWakeNotification() {
-            if (!screenOff) return;
-            
-            notificationTitle.textContent = "Incoming Call";
-            notificationBody.textContent = `${callerNameInput.value || "Unknown"} is calling...`;
-            
-            // Play notification sound
-            notificationSound.play().catch(e => console.log("Audio play failed:", e));
-            
-            // Show notification with animation
-            screenOffNotification.style.display = 'block';
-            
-            // Make notification pulse
-            screenOffNotification.style.animation = 'pulse 1.5s infinite';
-            
-            // Auto-hide notification after 10 seconds
-            if (screenOffTimeout) clearTimeout(screenOffTimeout);
-            screenOffTimeout = setTimeout(hideWakeNotification, 10000);
-        }
-        
-        // Hide wake notification
-        function hideWakeNotification() {
-            screenOffNotification.style.display = 'none';
-            screenOffNotification.style.animation = '';
-            notificationSound.pause();
-            notificationSound.currentTime = 0;
-        }
-        
-        // Wake screen function
-        function wakeScreen() {
-            screenOff = false;
-            document.body.classList.remove('screen-off');
-            screenOffBtn.innerHTML = '<i class="fas fa-power-off"></i>';
-            screenOffBtn.title = 'Simulate Screen Off';
-            hideWakeNotification();
-        }
-        
-        // Fullscreen toggle
-        fullscreenBtn.addEventListener('click', toggleFullscreen);
-        
-        function toggleFullscreen() {
-            if (!document.fullscreenElement) {
-                if (document.documentElement.requestFullscreen) {
-                    document.documentElement.requestFullscreen();
-                } else if (document.documentElement.webkitRequestFullscreen) {
-                    document.documentElement.webkitRequestFullscreen();
-                }
-                fullscreenBtn.innerHTML = '<i class="fas fa-compress"></i>';
-            } else {
-                if (document.exitFullscreen) {
-                    document.exitFullscreen();
-                } else if (document.webkitExitFullscreen) {
-                    document.webkitExitFullscreen();
-                }
-                fullscreenBtn.innerHTML = '<i class="fas fa-expand"></i>';
-            }
-        }
-        
-        // Update delay value display
-        delayTime.addEventListener('input', function() {
-            delayValue.textContent = this.value + 's';
-        });
-        
-        // Update caller photo when selection changes
-        callerPhotoSelect.addEventListener('change', function() {
-            photoImg.src = this.value;
-        });
-        
-        // Update caller name when input changes
-        callerNameInput.addEventListener('input', function() {
-            if (!callActive) {
-                callerName.textContent = this.value || "Unknown Caller";
-            }
-        });
-        
-        // Schedule a fake call
-        scheduleBtn.addEventListener('click', function() {
-            // Reset any existing call
-            resetCall();
-            
-            // Get the delay time
-            const delay = parseInt(delayTime.value) * 1000;
-            
-            // Update UI to show scheduled info
-            scheduleBtn.disabled = true;
-            scheduleBtn.innerHTML = '<i class="fas fa-spinner fa-spin"></i> Scheduling...';
-            
-            // Show scheduled info
-            scheduledInfo.style.display = 'block';
-            let countdownSeconds = parseInt(delayTime.value);
-            countdown.textContent = countdownSeconds;
-            
-            // Start countdown
-            countdownInterval = setInterval(() => {
-                countdownSeconds--;
-                countdown.textContent = countdownSeconds;
-                
-                if (countdownSeconds <= 0) {
-                    clearInterval(countdownInterval);
-                }
-            }, 1000);
-            
-            // Schedule the call
-            scheduledTimeout = setTimeout(() => {
-                startIncomingCall();
-                scheduleBtn.disabled = false;
-                scheduleBtn.innerHTML = '<i class="fas fa-play-circle"></i> Start Fake Call with Screen-Off Simulation';
-                scheduledInfo.style.display = 'none';
-                clearInterval(countdownInterval);
-            }, delay);
-        });
-        
-        // Start an incoming call
-        function startIncomingCall() {
-            callActive = true;
-            
-            // Update caller info from inputs
-            callerName.textContent = callerNameInput.value || "Unknown Caller";
-            photoImg.src = callerPhotoSelect.value;
-            
-            // Set call type
-            const type = callType.value;
-            let callTypeText = "Incoming call...";
-            if (type === 'emergency') callTypeText = "EMERGENCY CALL";
-            if (type === 'boss') callTypeText = "BOSS CALLING";
-            if (type === 'friend') callTypeText = "BEST FRIEND";
-            
-            callStatus.textContent = callTypeText;
-            
-            // If screen off simulation is enabled and screen is off
-            if (simulateScreenOffCheckbox.checked && screenOff) {
-                // Show notification on "sleeping" screen
-                notificationTitle.textContent = callTypeText;
-                notificationBody.textContent = `${callerName.textContent} is calling...`;
-                showWakeNotification();
-            } else {
-                // Otherwise show normal incoming call
-                showIncomingCall();
-            }
-        }
-        
-        // Show incoming call UI
-        function showIncomingCall() {
-            callTimer.style.display = 'none';
-            declineBtn.style.display = 'block';
-            acceptBtn.style.display = 'block';
-            endBtn.style.display = 'none';
-            
-            // Add ringing animation
-            callerPhoto.classList.add('ringing-animation');
-            
-            // Play ringtone
-            ringtoneAudio.play().catch(e => console.log("Audio play failed:", e));
-            
-            // Vibrate if supported
-            if ("vibrate" in navigator) {
-                navigator.vibrate([500, 500, 500, 500, 500, 500]);
-            }
-            
-            // Reset call answered flag
-            callAnswered = false;
-        }
-        
-        // Accept the call
-        acceptBtn.addEventListener('click', function() {
-            if (!callActive) return;
-            
-            callAnswered = true;
-            callStatus.textContent = "Connected";
-            callTimer.style.display = 'block';
-            declineBtn.style.display = 'none';
-            acceptBtn.style.display = 'none';
-            endBtn.style.display = 'block';
-            
-            // Remove ringing animation and stop ringtone
-            callerPhoto.classList.remove('ringing-animation');
-            ringtoneAudio.pause();
-            ringtoneAudio.currentTime = 0;
-            
-            // Stop vibration if active
-            if ("vibrate" in navigator) {
-                navigator.vibrate(0);
-            }
-            
-            // Hide notification if shown
-            hideWakeNotification();
-            
-            // Play call connected sound
-            callConnectedAudio.play().catch(e => console.log("Audio play failed:", e));
-            
-            // Start call timer
-            seconds = 0;
-            minutes = 0;
-            updateCallTimer();
-            callTimerInterval = setInterval(updateCallTimer, 1000);
-        });
-        
-        // Decline the call
-        declineBtn.addEventListener('click', function() {
-            if (!callActive) return;
-            
-            callStatus.textContent = "Call declined";
-            endCall();
-        });
-        
-        // End the call
-        endBtn.addEventListener('click', function() {
-            if (!callActive) return;
-            
-            callStatus.textContent = callAnswered ? "Call ended" : "Missed call";
-            endCall();
-        });
-        
-        // End call function
-        function endCall() {
-            callActive = false;
-            
-            // Remove ringing animation
-            callerPhoto.classList.remove('ringing-animation');
-            
-            // Stop any playing audio
-            ringtoneAudio.pause();
-            ringtoneAudio.currentTime = 0;
-            notificationSound.pause();
-            notificationSound.currentTime = 0;
-            
-            // Stop vibration if active
-            if ("vibrate" in navigator) {
-                navigator.vibrate(0);
-            }
-            
-            // Hide notification if shown
-            hideWakeNotification();
-            
-            // Play call ended sound
-            callEndedAudio.play().catch(e => console.log("Audio play failed:", e));
-            
-            // Hide call buttons
-            declineBtn.style.display = 'none';
-            acceptBtn.style.display = 'none';
-            endBtn.style.display = 'none';
-            
-            // Stop timer
-            clearInterval(callTimerInterval);
-            
-            // Reset after 3 seconds
-            setTimeout(resetCall, 3000);
-        }
-        
-        // Reset call to initial state
-        function resetCall() {
-            callActive = false;
-            callAnswered = false;
-            
-            // Clear any scheduled call
-            if (scheduledTimeout) {
-                clearTimeout(scheduledTimeout);
-                scheduledTimeout = null;
-            }
-            
-            // Clear countdown
-            if (countdownInterval) {
-                clearInterval(countdownInterval);
-            }
-            
-            // Reset UI
-            callStatus.textContent = "Ready for fake call";
-            callTimer.style.display = 'none';
-            callerPhoto.classList.remove('ringing-animation');
-            
-            // Reset buttons
-            declineBtn.style.display = 'block';
-            acceptBtn.style.display = 'block';
-            endBtn.style.display = 'none';
-            
-            // Reset schedule button
-            scheduleBtn.disabled = false;
-            scheduleBtn.innerHTML = '<i class="fas fa-play-circle"></i> Start Fake Call with Screen-Off Simulation';
-            
-            // Hide scheduled info
-            scheduledInfo.style.display = 'none';
-            
-            // Stop any audio
-            ringtoneAudio.pause();
-            ringtoneAudio.currentTime = 0;
-            notificationSound.pause();
-            notificationSound.currentTime = 0;
-            
-            // Stop timer
-            clearInterval(callTimerInterval);
-        }
-        
-        // Update the call timer display
-        function updateCallTimer() {
-            seconds++;
-            if (seconds >= 60) {
-                minutes++;
-                seconds = 0;
-            }
-            
-            const formattedMinutes = minutes < 10 ? `0${minutes}` : minutes;
-            const formattedSeconds = seconds < 10 ? `0${seconds}` : seconds;
-            callTimer.textContent = `${formattedMinutes}:${formattedSeconds}`;
-        }
-        
-        // Initialize the app
-        function init() {
-            // Set initial values
-            delayValue.textContent = delayTime.value + 's';
-            
-            // Set up notification icon based on call type
-            callType.addEventListener('change', function() {
-                const icons = {
-                    'normal': 'fa-phone-alt',
-                    'emergency': 'fa-exclamation-triangle',
-                    'boss': 'fa-user-tie',
-                    'friend': 'fa-user-friends'
-                };
-                document.querySelector('.screen-off-notification-icon i').className = `fas ${icons[this.value]}`;
             });
             
-            // Initial setup
-            callType.dispatchEvent(new Event('change'));
+            // If ringing, update the ringtone
+            if (appState.isRinging) {
+                playRingtone();
+            }
         }
-        
-        // Initialize the app when page loads
-        window.addEventListener('DOMContentLoaded', init);
+
+        // Select call audio
+        function selectCallAudio(id) {
+            appState.selectedCallAudio = id;
+            
+            // Update UI
+            document.querySelectorAll('#callAudioOptions .audio-option').forEach(opt => {
+                opt.classList.toggle('active', opt.dataset.id === id);
+                const checkIcon = opt.querySelector('.fa-check');
+                if (checkIcon) {
+                    checkIcon.style.display = opt.dataset.id === id ? 'block' : 'none';
+                }
+            });
+            
+            // If in call, update the call audio
+            if (appState.isInCall) {
+                playCallAudio();
+            }
+        }
+
+        // Play ringtone
+        function playRingtone() {
+            // Stop any existing ringtone
+            stopRingtone();
+            
+            // Generate ringtone based on selection
+            generateRingtone();
+            
+            // Play the ringtone
+            elements.ringtoneAudio.currentTime = 0;
+            elements.ringtoneAudio.loop = true;
+            elements.ringtoneAudio.play().catch(e => console.log('Audio play failed:', e));
+            
+            // Start vibration if enabled
+            if (appState.vibrationEnabled) {
+                startVibration();
+            }
+            
+            // Start flash if enabled
+            if (appState.flashEnabled) {
+                startFlash();
+            }
+            
+            appState.isRinging = true;
+        }
+
+        // Stop ringtone
+        function stopRingtone() {
+            elements.ringtoneAudio.pause();
+            elements.ringtoneAudio.currentTime = 0;
+            appState.isRinging = false;
+            
+            // Stop effects
+            stopVibration();
+            stopFlash();
+        }
+
+        // Play call audio
+        function playCallAudio() {
+            // Stop any existing call audio
+            stopCallAudio();
+            
+            // Generate call audio based on selection
+            generateCallAudio();
+            
+            // Play the call audio
+            elements.callAudio.currentTime = 0;
+            elements.callAudio.loop = true;
+            elements.callAudio.play().catch(e => console.log('Call audio play failed:', e));
+            
+            appState.isInCall = true;
+        }
+
+        // Stop call audio
+        function stopCallAudio() {
+            elements.callAudio.pause();
+            elements.callAudio.currentTime = 0;
+            appState.isInCall = false;
+        }
+
+        // Generate ringtone using Web Audio API
+        function generateRingtone() {
+            const audioContext = new (window.AudioContext || window.webkitAudioContext)();
+            const oscillator = audioContext.createOscillator();
+            const gainNode = audioContext.createGain();
+            
+            // Configure based on selected ringtone
+            switch(appState.selectedRingtone) {
+                case 'classic':
+                    oscillator.type = 'sine';
+                    oscillator.frequency.setValueAtTime(440, audioContext.currentTime);
+                    oscillator.frequency.setValueAtTime(440, audioContext.currentTime + 0.1);
+                    oscillator.frequency.setValueAtTime(350, audioContext.currentTime + 0.2);
+                    break;
+                case 'digital':
+                    oscillator.type = 'square';
+                    oscillator.frequency.setValueAtTime(800, audioContext.currentTime);
+                    break;
+                case 'melody':
+                    oscillator.type = 'sine';
+                    // Simple melody
+                    oscillator.frequency.setValueAtTime(523.25, audioContext.currentTime); // C5
+                    oscillator.frequency.setValueAtTime(659.25, audioContext.currentTime + 0.2); // E5
+                    oscillator.frequency.setValueAtTime(783.99, audioContext.currentTime + 0.4); // G5
+                    break;
+                case 'pulse':
+                    oscillator.type = 'sine';
+                    oscillator.frequency.setValueAtTime(600, audioContext.currentTime);
+                    break;
+                case 'echo':
+                    oscillator.type = 'sine';
+                    oscillator.frequency.setValueAtTime(500, audioContext.currentTime);
+                    break;
+            }
+            
+            // Create envelope for ringtone
+            gainNode.gain.setValueAtTime(0, audioContext.currentTime);
+            gainNode.gain.linearRampToValueAtTime(appState.ringtoneVolume, audioContext.currentTime + 0.05);
+            gainNode.gain.linearRampToValueAtTime(0, audioContext.currentTime + 0.3);
+            
+            // Connect and start
+            oscillator.connect(gainNode);
+            gainNode.connect(audioContext.destination);
+            oscillator.start();
+            oscillator.stop(audioContext.currentTime + 0.4);
+            
+            // For looping, we'd need to schedule multiple oscillators
+            // This is simplified for demo purposes
+        }
+
+        // Generate call audio
+        function generateCallAudio() {
+            // In a real implementation, this would generate or load
+            // appropriate background audio for the call
+            // For now, we'll use a placeholder
+        }
+
+        // Start vibration effect
+        function startVibration() {
+            if (appState.vibrationInterval) clearInterval(appState.vibrationInterval);
+            
+            // Simulate vibration with visual feedback
+            appState.vibrationInterval = setInterval(() => {
+                // Add a subtle shake to the call screen
+                elements.callScreen.style.transform = 'translateX(2px)';
+                setTimeout(() => {
+                    elements.callScreen.style.transform = 'translateX(-2px)';
+                }, 50);
+                setTimeout(() => {
+                    elements.callScreen.style.transform = 'translateX(0)';
+                }, 100);
+            }, 1000);
+        }
+
+        // Stop vibration
+        function stopVibration() {
+            if (appState.vibrationInterval) {
+                clearInterval(appState.vibrationInterval);
+                appState.vibrationInterval = null;
+                elements.callScreen.style.transform = 'translateX(0)';
+            }
+        }
+
+        // Start flash effect
+        function startFlash() {
+            if (appState.flashInterval) clearInterval(appState.flashInterval);
+            
+            appState.flashInterval = setInterval(() => {
+                elements.flashEffect.classList.add('active');
+                setTimeout(() => {
+                    elements.flashEffect.classList.remove('active');
+                }, 100);
+            }, 2000);
+        }
+
+        // Stop flash
+        function stopFlash() {
+            if (appState.flashInterval) {
+                clearInterval(appState.flashInterval);
+                appState.flashInterval = null;
+                elements.flashEffect.classList.remove('active');
+            }
+        }
+
+        // Start incoming call
+        function startIncomingCall() {
+            // Update caller info from profile
+            elements.callerName.textContent = appState.callerProfile.name;
+            
+            // Update avatar
+            updateCallerAvatar();
+            
+            // Show call screen
+            elements.callScreen.classList.add('active');
+            elements.mainMenu.style.display = 'none';
+            
+            // Set status
+            elements.callStatus.textContent = 'Incoming call...';
+            elements.callTimer.style.display = 'none';
+            elements.muteBtn.style.display = 'none';
+            
+            // Start ringtone
+            playRingtone();
+            
+            appState.isCallActive = true;
+            appState.isRinging = true;
+        }
+
+        // Answer call
+        function answerCall() {
+            // Stop ringtone and effects
+            stopRingtone();
+            
+            // Start call timer
+            appState.callStartTime = new Date();
+            startCallTimer();
+            
+            // Update UI
+            elements.callStatus.textContent = 'Connected';
+            elements.callTimer.style.display = 'block';
+            elements.muteBtn.style.display = 'block';
+            
+            // Start call audio
+            playCallAudio();
+            
+            appState.isRinging = false;
+            appState.isInCall = true;
+        }
+
+        // Decline call
+        function declineCall() {
+            // Stop all audio and effects
+            stopRingtone();
+            stopCallAudio();
+            
+            // Hide call screen
+            elements.callScreen.classList.remove('active');
+            elements.mainMenu.style.display = 'flex';
+            
+            // Reset timer
+            if (appState.timerInterval) {
+                clearInterval(appState.timerInterval);
+                appState.timerInterval = null;
+            }
+            
+            appState.isCallActive = false;
+            appState.isRinging = false;
+            appState.isInCall = false;
+        }
+
+        // Start call timer
+        function startCallTimer() {
+            if (appState.timerInterval) clearInterval(appState.timerInterval);
+            
+            appState.timerInterval = setInterval(() => {
+                const now = new Date();
+                const diff = Math.floor((now - appState.callStartTime) / 1000);
+                const minutes = Math.floor(diff / 60);
+                const seconds = diff % 60;
+                elements.callTimer.textContent = 
+                    `${minutes.toString().padStart(2, '0')}:${seconds.toString().padStart(2, '0')}`;
+            }, 1000);
+        }
+
+        // Update caller avatar
+        function updateCallerAvatar() {
+            if (appState.callerProfile.avatar) {
+                elements.callerAvatar.innerHTML = `<img src="${appState.callerProfile.avatar}" alt="Caller">`;
+                elements.profileAvatar.innerHTML = `<img src="${appState.callerProfile.avatar}" alt="Caller">`;
+            } else {
+                elements.callerAvatar.innerHTML = '<i class="fas fa-user"></i>';
+                elements.profileAvatar.innerHTML = '<i class="fas fa-user"></i>';
+            }
+        }
+
+        // Show notification
+        function showNotification(message) {
+            elements.notification.querySelector('span').textContent = message;
+            elements.notification.classList.add('active');
+            
+            setTimeout(() => {
+                elements.notification.classList.remove('active');
+            }, 3000);
+        }
+
+        // Format date for datetime-local input
+        function formatDateTimeLocal(date) {
+            const year = date.getFullYear();
+            const month = (date.getMonth() + 1).toString().padStart(2, '0');
+            const day = date.getDate().toString().padStart(2, '0');
+            const hours = date.getHours().toString().padStart(2, '0');
+            const minutes = date.getMinutes().toString().padStart(2, '0');
+            
+            return `${year}-${month}-${day}T${hours}:${minutes}`;
+        }
+
+        // Load saved settings
+        function loadSettings() {
+            const saved = localStorage.getItem('callSimulatorSettings');
+            if (saved) {
+                const settings = JSON.parse(saved);
+                
+                // Apply settings
+                appState.selectedRingtone = settings.selectedRingtone || appState.selectedRingtone;
+                appState.selectedCallAudio = settings.selectedCallAudio || appState.selectedCallAudio;
+                appState.ringtoneVolume = settings.ringtoneVolume || appState.ringtoneVolume;
+                appState.callVolume = settings.callVolume || appState.callVolume;
+                appState.vibrationEnabled = settings.vibrationEnabled !== undefined ? settings.vibrationEnabled : appState.vibrationEnabled;
+                appState.flashEnabled = settings.flashEnabled !== undefined ? settings.flashEnabled : appState.flashEnabled;
+                appState.callerProfile = settings.callerProfile || appState.callerProfile;
+                
+                // Update UI
+                elements.ringtoneVolume.value = appState.ringtoneVolume * 100;
+                elements.callVolume.value = appState.callVolume * 100;
+                elements.vibrationToggle.checked = appState.vibrationEnabled;
+                elements.flashToggle.checked = appState.flashEnabled;
+                elements.callerNameInput.value = appState.callerProfile.name;
+                elements.callerNumberInput.value = appState.callerProfile.number;
+                elements.callTypeInput.value = appState.callerProfile.type;
+                
+                // Update avatar if exists
+                if (appState.callerProfile.avatar) {
+                    updateCallerAvatar();
+                }
+                
+                // Update audio option selections
+                selectRingtone(appState.selectedRingtone);
+                selectCallAudio(appState.selectedCallAudio);
+            }
+        }
+
+        // Save settings
+        function saveSettings() {
+            const settings = {
+                selectedRingtone: appState.selectedRingtone,
+                selectedCallAudio: appState.selectedCallAudio,
+                ringtoneVolume: appState.ringtoneVolume,
+                callVolume: appState.callVolume,
+                vibrationEnabled: appState.vibrationEnabled,
+                flashEnabled: appState.flashEnabled,
+                callerProfile: appState.callerProfile
+            };
+            
+            localStorage.setItem('callSimulatorSettings', JSON.stringify(settings));
+            showNotification('Settings saved successfully');
+        }
+
+        // Setup event listeners
+        function setupEventListeners() {
+            // Main menu buttons
+            elements.startCallBtn.addEventListener('click', startIncomingCall);
+            elements.settingsBtn.addEventListener('click', () => {
+                elements.settingsModal.classList.add('active');
+            });
+            elements.callerBtn.addEventListener('click', () => {
+                elements.callerModal.classList.add('active');
+            });
+            elements.scheduleBtn.addEventListener('click', () => {
+                elements.scheduleModal.classList.add('active');
+            });
+
+            // Call controls
+            elements.acceptCallBtn.addEventListener('click', answerCall);
+            elements.declineCallBtn.addEventListener('click', declineCall);
+            elements.muteBtn.addEventListener('click', () => {
+                const isMuted = elements.muteBtn.classList.toggle('muted');
+                elements.muteBtn.innerHTML = isMuted ? 
+                    '<i class="fas fa-microphone"></i>' : 
+                    '<i class="fas fa-microphone-slash"></i>';
+                
+                // In a real app, this would mute/unmute the microphone
+                showNotification(isMuted ? 'Microphone muted' : 'Microphone unmuted');
+            });
+
+            // Settings modal
+            elements.closeSettingsBtn.addEventListener('click', () => {
+                elements.settingsModal.classList.remove('active');
+            });
+            elements.saveSettingsBtn.addEventListener('click', () => {
+                // Update app state from settings
+                appState.ringtoneVolume = elements.ringtoneVolume.value / 100;
+                appState.callVolume = elements.callVolume.value / 100;
+                appState.vibrationEnabled = elements.vibrationToggle.checked;
+                appState.flashEnabled = elements.flashToggle.checked;
+                
+                // Update audio volumes
+                updateAudioVolumes();
+                
+                // Save settings
+                saveSettings();
+                
+                elements.settingsModal.classList.remove('active');
+            });
+
+            // Caller modal
+            elements.closeCallerBtn.addEventListener('click', () => {
+                elements.callerModal.classList.remove('active');
+            });
+            elements.saveCallerBtn.addEventListener('click', () => {
+                appState.callerProfile.name = elements.callerNameInput.value;
+                appState.callerProfile.number = elements.callerNumberInput.value;
+                appState.callerProfile.type = elements.callTypeInput.value;
+                
+                saveSettings();
+                elements.callerModal.classList.remove('active');
+            });
+            elements.changePhotoBtn.addEventListener('click', () => {
+                elements.avatarUpload.click();
+            });
+            elements.avatarUpload.addEventListener('change', function(e) {
+                const file = e.target.files[0];
+                if (file) {
+                    const reader = new FileReader();
+                    reader.onload = function(event) {
+                        appState.callerProfile.avatar = event.target.result;
+                        updateCallerAvatar();
+                        saveSettings();
+                        showNotification('Profile photo updated');
+                    };
+                    reader.readAsDataURL(file);
+                }
+            });
+
+            // Schedule modal
+            elements.closeScheduleBtn.addEventListener('click', () => {
+                elements.scheduleModal.classList.remove('active');
+            });
+            elements.saveScheduleBtn.addEventListener('click', () => {
+                const scheduleTime = new Date(elements.scheduleTime.value);
+                const now = new Date();
+                
+                if (scheduleTime <= now) {
+                    alert('Please select a future time');
+                    return;
+                }
+                
+                const delay = scheduleTime.getTime() - now.getTime();
+                
+                // Clear any existing scheduled call
+                if (appState.scheduledCallTimeout) {
+                    clearTimeout(appState.scheduledCallTimeout);
+                }
+                
+                // Schedule the call
+                appState.scheduledCallTimeout = setTimeout(() => {
+                    startIncomingCall();
+                    showNotification('Scheduled call incoming!');
+                }, delay);
+                
+                // Show confirmation
+                const timeStr = scheduleTime.toLocaleTimeString([], {hour: '2-digit', minute:'2-digit'});
+                elements.scheduleText.textContent = `Call scheduled for ${timeStr}`;
+                elements.scheduleInfo.style.display = 'block';
+                
+                showNotification('Call scheduled successfully');
+                setTimeout(() => {
+                    elements.scheduleModal.classList.remove('active');
+                }, 1500);
+            });
+
+            // Quick schedule options
+            document.querySelectorAll('.schedule-option').forEach(option => {
+                option.addEventListener('click', function() {
+                    const minutes = parseInt(this.dataset.minutes);
+                    const scheduledTime = new Date();
+                    scheduledTime.setMinutes(scheduledTime.getMinutes() + minutes);
+                    
+                    elements.scheduleTime.value = formatDateTimeLocal(scheduledTime);
+                    
+                    // Highlight selected option
+                    document.querySelectorAll('.schedule-option').forEach(opt => {
+                        opt.classList.remove('active');
+                    });
+                    this.classList.add('active');
+                    
+                    // Update info display
+                    const timeStr = scheduledTime.toLocaleTimeString([], {hour: '2-digit', minute:'2-digit'});
+                    elements.scheduleText.textContent = `Call will ring at ${timeStr}`;
+                    elements.scheduleInfo.style.display = 'block';
+                });
+            });
+
+            // Volume controls
+            elements.ringtoneVolume.addEventListener('input', function() {
+                appState.ringtoneVolume = this.value / 100;
+                updateAudioVolumes();
+            });
+            
+            elements.callVolume.addEventListener('input', function() {
+                appState.callVolume = this.value / 100;
+                updateAudioVolumes();
+            });
+
+            // Prevent context menu on long press
+            document.addEventListener('contextmenu', (e) => e.preventDefault());
+        }
+
+        // Initialize the app when DOM is loaded
+        document.addEventListener('DOMContentLoaded', initApp);
     </script>
 </body>
 </html>
