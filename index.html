@@ -6,53 +6,23 @@
     <title>Call Simulator | Realistic Mobile Experience</title>
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
     <style>
-        /* Android 13 / iOS 17 inspired design system */
         :root {
-            /* iOS 17 Colors */
             --ios-blue: #007AFF;
             --ios-green: #34C759;
             --ios-red: #FF3B30;
             --ios-gray: #8E8E93;
-            --ios-gray2: #AEAEB2;
-            --ios-gray3: #C7C7CC;
-            --ios-gray4: #D1D1D6;
-            --ios-gray5: #E5E5EA;
             --ios-gray6: #F2F2F7;
-            --ios-label: #000000;
-            --ios-secondary-label: #3C3C4399;
-            
-            /* Android 13 Colors */
-            --android-primary: #6750A4;
-            --android-secondary: #625B71;
-            --android-tertiary: #7D5260;
-            --android-surface: #FFFBFE;
-            --android-surface-variant: #E7E0EC;
-            --android-outline: #79747E;
-            --android-error: #B3261E;
-            
-            /* Shared */
-            --primary-color: var(--ios-blue);
-            --danger-color: var(--ios-red);
-            --success-color: var(--ios-green);
             --background: #000000;
             --surface: #1C1C1E;
             --text-primary: #FFFFFF;
             --text-secondary: #98989D;
-            
-            /* Spacing */
             --spacing-xs: 4px;
             --spacing-sm: 8px;
             --spacing-md: 16px;
             --spacing-lg: 24px;
             --spacing-xl: 32px;
             --spacing-xxl: 48px;
-            
-            /* Typography - Web-safe matches for iOS SF Pro and Android Roboto */
             --font-primary: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Helvetica, Arial, sans-serif;
-            --font-display: system-ui, -apple-system, 'Segoe UI', Roboto, Helvetica, Arial, sans-serif;
-            --font-mono: ui-monospace, 'Cascadia Code', 'Source Code Pro', Menlo, Consolas, 'DejaVu Sans Mono', monospace;
-            
-            /* Effects */
             --shadow-sm: 0 2px 8px rgba(0, 0, 0, 0.15);
             --shadow-md: 0 4px 16px rgba(0, 0, 0, 0.2);
             --shadow-lg: 0 8px 32px rgba(0, 0, 0, 0.25);
@@ -81,7 +51,6 @@
             letter-spacing: -0.022em;
         }
 
-        /* iOS Status Bar */
         .status-bar {
             position: fixed;
             top: 0;
@@ -116,7 +85,6 @@
             justify-content: flex-end;
         }
 
-        /* App Container */
         .app-container {
             flex: 1;
             display: flex;
@@ -128,7 +96,6 @@
             min-height: calc(100vh - 44px);
         }
 
-        /* Main Menu Screen */
         .main-menu {
             flex: 1;
             padding: var(--spacing-lg) var(--spacing-md);
@@ -157,7 +124,6 @@
             font-size: 15px;
         }
 
-        /* Menu Grid */
         .menu-grid {
             display: grid;
             grid-template-columns: repeat(2, 1fr);
@@ -175,6 +141,7 @@
             text-decoration: none;
             transition: transform 0.2s, background-color 0.2s;
             border: 1px solid rgba(255, 255, 255, 0.08);
+            cursor: pointer;
         }
 
         .menu-item:active {
@@ -205,7 +172,6 @@
             text-align: center;
         }
 
-        /* Call Screen */
         .call-screen {
             position: fixed;
             top: 0;
@@ -277,7 +243,6 @@
             margin-top: var(--spacing-md);
         }
 
-        /* Call Controls */
         .call-controls {
             display: flex;
             justify-content: center;
@@ -326,7 +291,6 @@
             font-size: 18px;
         }
 
-        /* Modal Styles */
         .modal {
             position: fixed;
             top: 0;
@@ -413,7 +377,6 @@
             color: white;
         }
 
-        /* Form Elements */
         .form-group {
             margin-bottom: var(--spacing-lg);
         }
@@ -444,12 +407,11 @@
             border-color: var(--ios-blue);
         }
 
-        /* Ringtone/Call Audio Selection */
         .audio-options {
             display: flex;
             flex-direction: column;
             gap: var(--spacing-sm);
-            max-height: 300px;
+            max-height: 200px;
             overflow-y: auto;
         }
 
@@ -489,7 +451,108 @@
             color: var(--text-secondary);
         }
 
-        /* Schedule Picker */
+        .audio-preview {
+            color: var(--text-secondary);
+            font-size: 14px;
+            cursor: pointer;
+            padding: 4px 8px;
+            border-radius: 6px;
+            background: rgba(255, 255, 255, 0.05);
+            transition: background-color 0.2s;
+        }
+
+        .audio-preview:hover {
+            background: rgba(255, 255, 255, 0.1);
+        }
+
+        .custom-audio-upload {
+            margin-top: var(--spacing-md);
+            border: 2px dashed rgba(255, 255, 255, 0.1);
+            border-radius: 12px;
+            padding: var(--spacing-lg);
+            text-align: center;
+            cursor: pointer;
+            transition: border-color 0.2s, background-color 0.2s;
+        }
+
+        .custom-audio-upload:hover {
+            border-color: var(--ios-blue);
+            background: rgba(0, 122, 255, 0.05);
+        }
+
+        .custom-audio-upload i {
+            font-size: 32px;
+            color: var(--ios-blue);
+            margin-bottom: var(--spacing-sm);
+        }
+
+        .custom-audio-upload p {
+            color: var(--text-secondary);
+            margin-bottom: var(--spacing-sm);
+        }
+
+        .custom-audio-upload small {
+            color: var(--text-secondary);
+            font-size: 11px;
+            opacity: 0.7;
+        }
+
+        .custom-audio-file {
+            display: flex;
+            align-items: center;
+            padding: var(--spacing-md);
+            background: rgba(255, 255, 255, 0.05);
+            border-radius: 12px;
+            margin-top: var(--spacing-md);
+        }
+
+        .custom-audio-file i {
+            margin-right: var(--spacing-md);
+            color: var(--ios-green);
+        }
+
+        .custom-audio-name {
+            flex: 1;
+            overflow: hidden;
+            text-overflow: ellipsis;
+            white-space: nowrap;
+        }
+
+        .custom-audio-delete {
+            color: var(--ios-red);
+            background: none;
+            border: none;
+            font-size: 14px;
+            cursor: pointer;
+            padding: 4px 8px;
+            border-radius: 6px;
+            transition: background-color 0.2s;
+        }
+
+        .custom-audio-delete:hover {
+            background: rgba(255, 59, 48, 0.1);
+        }
+
+        .continuous-audio-control {
+            background: rgba(255, 255, 255, 0.05);
+            border-radius: 12px;
+            padding: var(--spacing-md);
+            margin-top: var(--spacing-md);
+        }
+
+        .continuous-audio-toggle {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            margin-bottom: var(--spacing-sm);
+        }
+
+        .continuous-audio-toggle label {
+            display: flex;
+            align-items: center;
+            gap: var(--spacing-sm);
+        }
+
         .schedule-grid {
             display: grid;
             grid-template-columns: repeat(3, 1fr);
@@ -511,7 +574,6 @@
             color: white;
         }
 
-        /* Flash effect for vibration simulation */
         .flash-effect {
             position: fixed;
             top: 0;
@@ -534,7 +596,6 @@
             100% { opacity: 0; }
         }
 
-        /* Notification */
         .notification {
             position: fixed;
             top: 60px;
@@ -563,7 +624,52 @@
             font-size: 20px;
         }
 
-        /* Responsive */
+        .volume-control {
+            margin-top: var(--spacing-md);
+        }
+
+        .volume-slider {
+            width: 100%;
+            height: 6px;
+            -webkit-appearance: none;
+            appearance: none;
+            background: rgba(255, 255, 255, 0.1);
+            border-radius: 3px;
+            outline: none;
+            margin: var(--spacing-sm) 0;
+        }
+
+        .volume-slider::-webkit-slider-thumb {
+            -webkit-appearance: none;
+            appearance: none;
+            width: 20px;
+            height: 20px;
+            border-radius: 50%;
+            background: var(--ios-blue);
+            cursor: pointer;
+            border: 2px solid var(--surface);
+        }
+
+        .volume-labels {
+            display: flex;
+            justify-content: space-between;
+            font-size: 12px;
+            color: var(--text-secondary);
+        }
+
+        .spinner {
+            width: 20px;
+            height: 20px;
+            border: 2px solid rgba(255, 255, 255, 0.3);
+            border-radius: 50%;
+            border-top-color: var(--ios-blue);
+            animation: spin 1s ease-in-out infinite;
+        }
+
+        @keyframes spin {
+            to { transform: rotate(360deg); }
+        }
+
         @media (max-width: 375px) {
             .menu-grid {
                 grid-template-columns: 1fr;
@@ -590,15 +696,21 @@
             }
         }
 
-        /* Hide scrollbar but keep functionality */
         ::-webkit-scrollbar {
             width: 0;
             background: transparent;
         }
+
+        .loading-audio {
+            display: inline-flex;
+            align-items: center;
+            gap: 8px;
+            color: var(--text-secondary);
+            font-size: 12px;
+        }
     </style>
 </head>
 <body>
-    <!-- Status Bar (iOS Style) -->
     <div class="status-bar">
         <div class="status-left">
             <span>9:41</span>
@@ -611,9 +723,7 @@
         </div>
     </div>
 
-    <!-- Main App Container -->
     <div class="app-container">
-        <!-- Main Menu -->
         <div class="main-menu" id="mainMenu">
             <div class="menu-header">
                 <h1>Call Simulator</h1>
@@ -656,12 +766,11 @@
             
             <div style="text-align: center; margin-top: auto; padding-top: var(--spacing-xl); color: var(--text-secondary); font-size: 13px;">
                 <p>Tap "Start Call" to begin simulation</p>
-                <p style="margin-top: var(--spacing-xs);">Adjust volume for realistic experience</p>
+                <p style="margin-top: var(--spacing-xs);">Upload custom MP3 files for ringtone</p>
             </div>
         </div>
     </div>
 
-    <!-- Call Screen -->
     <div class="call-screen" id="callScreen">
         <button class="control-btn mute-btn" id="muteBtn" style="display: none;">
             <i class="fas fa-microphone-slash"></i>
@@ -686,7 +795,6 @@
         </div>
     </div>
 
-    <!-- Settings Modal -->
     <div class="modal" id="settingsModal">
         <div class="modal-content">
             <div class="modal-header">
@@ -696,14 +804,59 @@
                 <div class="form-group">
                     <label>Ringtone</label>
                     <div class="audio-options" id="ringtoneOptions">
-                        <!-- Ringtone options will be populated by JS -->
+                        <!-- Ringtone options populated by JS -->
+                    </div>
+                    
+                    <div class="custom-audio-upload" id="customRingtoneUpload">
+                        <i class="fas fa-file-audio"></i>
+                        <p>Upload Custom Ringtone</p>
+                        <small>Click to select MP3 file</small>
+                        <input type="file" id="ringtoneUpload" accept=".mp3,audio/*" style="display: none;">
+                    </div>
+                    
+                    <div id="customRingtoneDisplay" style="display: none;"></div>
+                    
+                    <div class="volume-control">
+                        <input type="range" min="0" max="100" value="70" class="volume-slider" id="ringtoneVolume">
+                        <div class="volume-labels">
+                            <span>Low</span>
+                            <span id="ringtoneVolumeValue">70%</span>
+                            <span>High</span>
+                        </div>
                     </div>
                 </div>
                 
                 <div class="form-group">
                     <label>Call Background Audio</label>
                     <div class="audio-options" id="callAudioOptions">
-                        <!-- Call audio options will be populated by JS -->
+                        <!-- Call audio options populated by JS -->
+                    </div>
+                    
+                    <div class="custom-audio-upload" id="customCallAudioUpload">
+                        <i class="fas fa-file-audio"></i>
+                        <p>Upload Custom Call Audio</p>
+                        <small>Click to select MP3 file</small>
+                        <input type="file" id="callAudioUpload" accept=".mp3,audio/*" style="display: none;">
+                    </div>
+                    
+                    <div id="customCallAudioDisplay" style="display: none;"></div>
+                    
+                    <div class="continuous-audio-control">
+                        <div class="continuous-audio-toggle">
+                            <label>
+                                <input type="checkbox" id="continuousAudioToggle" checked>
+                                <span>Continuous Background Audio</span>
+                            </label>
+                            <i class="fas fa-info-circle" style="color: var(--ios-gray); cursor: help;" title="Plays low-volume background audio during calls"></i>
+                        </div>
+                        <div class="volume-control">
+                            <input type="range" min="0" max="100" value="30" class="volume-slider" id="callVolume">
+                            <div class="volume-labels">
+                                <span>Low</span>
+                                <span id="callVolumeValue">30%</span>
+                                <span>High</span>
+                            </div>
+                        </div>
                     </div>
                 </div>
                 
@@ -720,16 +873,6 @@
                         </label>
                     </div>
                 </div>
-                
-                <div class="form-group">
-                    <label>Ringtone Volume</label>
-                    <input type="range" min="0" max="100" value="70" class="form-control" id="ringtoneVolume">
-                </div>
-                
-                <div class="form-group">
-                    <label>Call Audio Volume</label>
-                    <input type="range" min="0" max="100" value="30" class="form-control" id="callVolume">
-                </div>
             </div>
             <div class="modal-footer">
                 <button class="btn btn-secondary" id="closeSettingsBtn">Cancel</button>
@@ -738,7 +881,6 @@
         </div>
     </div>
 
-    <!-- Caller Profile Modal -->
     <div class="modal" id="callerModal">
         <div class="modal-content">
             <div class="modal-header">
@@ -782,7 +924,6 @@
         </div>
     </div>
 
-    <!-- Schedule Modal -->
     <div class="modal" id="scheduleModal">
         <div class="modal-content">
             <div class="modal-header">
@@ -820,18 +961,17 @@
         </div>
     </div>
 
-    <!-- Flash Effect -->
     <div class="flash-effect" id="flashEffect"></div>
 
-    <!-- Notification -->
     <div class="notification" id="notification">
         <i class="fas fa-check-circle"></i>
-        <span>Call scheduled successfully</span>
+        <span id="notificationText">Call scheduled successfully</span>
     </div>
 
     <!-- Audio Elements -->
-    <audio id="ringtoneAudio" preload="auto" loop></audio>
-    <audio id="callAudio" preload="auto" loop></audio>
+    <audio id="currentRingtone" preload="none"></audio>
+    <audio id="currentCallAudio" preload="none" loop></audio>
+    <audio id="continuousBackgroundAudio" preload="none" loop></audio>
 
     <script>
         // App State
@@ -848,32 +988,73 @@
             selectedCallAudio: 'conversation',
             ringtoneVolume: 0.7,
             callVolume: 0.3,
+            continuousAudioVolume: 0.1,
             vibrationEnabled: true,
             flashEnabled: true,
+            continuousAudioEnabled: true,
             callerProfile: {
                 name: 'John Smith',
                 number: '+1 (555) 123-4567',
                 type: 'mobile',
                 avatar: null
+            },
+            customAudio: {
+                ringtone: null,
+                callAudio: null
             }
         };
 
-        // Audio Data
+        // Audio Data with working URLs
         const audioData = {
             ringtones: [
-                { id: 'classic', name: 'Classic Ringtone', icon: 'fa-bell', duration: '4s' },
-                { id: 'digital', name: 'Digital Beep', icon: 'fa-wave-square', duration: '3s' },
-                { id: 'melody', name: 'Simple Melody', icon: 'fa-music', duration: '5s' },
-                { id: 'pulse', name: 'Pulse Ring', icon: 'fa-heartbeat', duration: '3s' },
-                { id: 'echo', name: 'Echo Ring', icon: 'fa-echo', duration: '4s' }
+                { 
+                    id: 'classic', 
+                    name: 'Classic Telephone', 
+                    icon: 'fa-bell',
+                    duration: '4s',
+                    url: 'https://assets.mixkit.co/sfx/preview/mixkit-classic-phone-ring-1000.mp3'
+                },
+                { 
+                    id: 'digital', 
+                    name: 'Digital Beep', 
+                    icon: 'fa-wave-square',
+                    duration: '3s',
+                    url: 'https://assets.mixkit.co/sfx/preview/mixkit-digital-beep-1008.mp3'
+                },
+                { 
+                    id: 'melody', 
+                    name: 'Simple Melody', 
+                    icon: 'fa-music',
+                    duration: '5s',
+                    url: 'https://assets.mixkit.co/sfx/preview/mixkit-melodic-chime-1003.mp3'
+                }
             ],
             callAudio: [
-                { id: 'conversation', name: 'Conversation', icon: 'fa-comments', duration: 'Loop' },
-                { id: 'cafe', name: 'Cafe Background', icon: 'fa-coffee', duration: 'Loop' },
-                { id: 'street', name: 'Street Noise', icon: 'fa-car', duration: 'Loop' },
-                { id: 'office', name: 'Office Ambience', icon: 'fa-building', duration: 'Loop' },
-                { id: 'nature', name: 'Nature Sounds', icon: 'fa-tree', duration: 'Loop' }
-            ]
+                { 
+                    id: 'conversation', 
+                    name: 'Conversation', 
+                    icon: 'fa-comments',
+                    duration: 'Loop',
+                    url: 'https://assets.mixkit.co/music/preview/mixkit-small-crowd-talk-and-walk-517.mp3'
+                },
+                { 
+                    id: 'cafe', 
+                    name: 'Cafe Background', 
+                    icon: 'fa-coffee',
+                    duration: 'Loop',
+                    url: 'https://assets.mixkit.co/music/preview/mixkit-coffee-shop-background-loop-370.mp3'
+                },
+                { 
+                    id: 'street', 
+                    name: 'Street Noise', 
+                    icon: 'fa-car',
+                    duration: 'Loop',
+                    url: 'https://assets.mixkit.co/music/preview/mixkit-busy-city-street-426.mp3'
+                }
+            ],
+            continuousAudio: {
+                url: 'https://assets.mixkit.co/music/preview/mixkit-very-light-wind-2026.mp3'
+            }
         };
 
         // DOM Elements
@@ -897,10 +1078,19 @@
             scheduleModal: document.getElementById('scheduleModal'),
             ringtoneOptions: document.getElementById('ringtoneOptions'),
             callAudioOptions: document.getElementById('callAudioOptions'),
+            customRingtoneUpload: document.getElementById('customRingtoneUpload'),
+            customCallAudioUpload: document.getElementById('customCallAudioUpload'),
+            customRingtoneDisplay: document.getElementById('customRingtoneDisplay'),
+            customCallAudioDisplay: document.getElementById('customCallAudioDisplay'),
+            ringtoneUpload: document.getElementById('ringtoneUpload'),
+            callAudioUpload: document.getElementById('callAudioUpload'),
             vibrationToggle: document.getElementById('vibrationToggle'),
             flashToggle: document.getElementById('flashToggle'),
+            continuousAudioToggle: document.getElementById('continuousAudioToggle'),
             ringtoneVolume: document.getElementById('ringtoneVolume'),
+            ringtoneVolumeValue: document.getElementById('ringtoneVolumeValue'),
             callVolume: document.getElementById('callVolume'),
+            callVolumeValue: document.getElementById('callVolumeValue'),
             closeSettingsBtn: document.getElementById('closeSettingsBtn'),
             saveSettingsBtn: document.getElementById('saveSettingsBtn'),
             closeCallerBtn: document.getElementById('closeCallerBtn'),
@@ -917,13 +1107,15 @@
             scheduleText: document.getElementById('scheduleText'),
             flashEffect: document.getElementById('flashEffect'),
             notification: document.getElementById('notification'),
-            ringtoneAudio: document.getElementById('ringtoneAudio'),
-            callAudio: document.getElementById('callAudio')
+            notificationText: document.getElementById('notificationText'),
+            currentRingtone: document.getElementById('currentRingtone'),
+            currentCallAudio: document.getElementById('currentCallAudio'),
+            continuousBackgroundAudio: document.getElementById('continuousBackgroundAudio')
         };
 
         // Initialize App
         function initApp() {
-            // Set default schedule time to now + 5 minutes
+            // Set default schedule time
             const defaultTime = new Date();
             defaultTime.setMinutes(defaultTime.getMinutes() + 5);
             elements.scheduleTime.value = formatDateTimeLocal(defaultTime);
@@ -934,67 +1126,314 @@
             // Load saved settings
             loadSettings();
             
-            // Initialize audio
-            initAudio();
-            
             // Set up event listeners
             setupEventListeners();
+            
+            // Preload continuous audio
+            preloadContinuousAudio();
+            
+            showNotification('Call Simulator ready. Click Start Call to begin.');
+        }
+
+        // Preload continuous audio
+        function preloadContinuousAudio() {
+            elements.continuousBackgroundAudio.src = audioData.continuousAudio.url;
+            elements.continuousBackgroundAudio.load();
         }
 
         // Populate audio selection options
         function populateAudioOptions() {
             // Ringtone options
+            elements.ringtoneOptions.innerHTML = '';
             audioData.ringtones.forEach(rt => {
-                const option = document.createElement('div');
-                option.className = `audio-option ${rt.id === appState.selectedRingtone ? 'active' : ''}`;
-                option.dataset.id = rt.id;
-                option.innerHTML = `
-                    <i class="fas ${rt.icon}"></i>
-                    <div class="audio-info">
-                        <div class="audio-name">${rt.name}</div>
-                        <div class="audio-duration">${rt.duration}</div>
-                    </div>
-                    ${rt.id === appState.selectedRingtone ? '<i class="fas fa-check" style="color: var(--ios-blue);"></i>' : ''}
-                `;
-                option.addEventListener('click', () => selectRingtone(rt.id));
+                const option = createAudioOption(rt, 'ringtone');
                 elements.ringtoneOptions.appendChild(option);
             });
 
             // Call audio options
+            elements.callAudioOptions.innerHTML = '';
             audioData.callAudio.forEach(ca => {
-                const option = document.createElement('div');
-                option.className = `audio-option ${ca.id === appState.selectedCallAudio ? 'active' : ''}`;
-                option.dataset.id = ca.id;
-                option.innerHTML = `
-                    <i class="fas ${ca.icon}"></i>
-                    <div class="audio-info">
-                        <div class="audio-name">${ca.name}</div>
-                        <div class="audio-duration">${ca.duration}</div>
-                    </div>
-                    ${ca.id === appState.selectedCallAudio ? '<i class="fas fa-check" style="color: var(--ios-blue);"></i>' : ''}
-                `;
-                option.addEventListener('click', () => selectCallAudio(ca.id));
+                const option = createAudioOption(ca, 'call');
                 elements.callAudioOptions.appendChild(option);
+            });
+            
+            // Setup custom audio uploads
+            setupCustomAudioUploads();
+        }
+
+        // Create audio option element
+        function createAudioOption(audio, type) {
+            const option = document.createElement('div');
+            option.className = `audio-option ${audio.id === (type === 'ringtone' ? appState.selectedRingtone : appState.selectedCallAudio) ? 'active' : ''}`;
+            option.dataset.id = audio.id;
+            option.dataset.type = type;
+            option.innerHTML = `
+                <i class="fas ${audio.icon}"></i>
+                <div class="audio-info">
+                    <div class="audio-name">${audio.name}</div>
+                    <div class="audio-duration">${audio.duration}</div>
+                </div>
+                <div class="audio-preview" data-audio-id="${audio.id}" data-type="${type}">
+                    <i class="fas fa-play"></i> Preview
+                </div>
+                ${audio.id === (type === 'ringtone' ? appState.selectedRingtone : appState.selectedCallAudio) ? '<i class="fas fa-check" style="color: var(--ios-blue); margin-left: 8px;"></i>' : ''}
+            `;
+            option.addEventListener('click', (e) => {
+                if (!e.target.classList.contains('audio-preview')) {
+                    if (type === 'ringtone') {
+                        selectRingtone(audio.id);
+                    } else {
+                        selectCallAudio(audio.id);
+                    }
+                }
+            });
+            
+            // Add preview event listener
+            const previewBtn = option.querySelector('.audio-preview');
+            previewBtn.addEventListener('click', async (e) => {
+                e.stopPropagation();
+                await playPreview(audio.id, type);
+            });
+            
+            return option;
+        }
+
+        // Setup custom audio upload functionality
+        function setupCustomAudioUploads() {
+            // Ringtone upload
+            elements.customRingtoneUpload.addEventListener('click', () => {
+                elements.ringtoneUpload.click();
+            });
+            
+            elements.ringtoneUpload.addEventListener('change', (e) => {
+                const file = e.target.files[0];
+                if (file && (file.type.startsWith('audio/') || file.name.endsWith('.mp3'))) {
+                    handleCustomAudioUpload(file, 'ringtone');
+                } else {
+                    showNotification('Please select a valid audio file (MP3 recommended)');
+                }
+            });
+
+            // Call audio upload
+            elements.customCallAudioUpload.addEventListener('click', () => {
+                elements.callAudioUpload.click();
+            });
+            
+            elements.callAudioUpload.addEventListener('change', (e) => {
+                const file = e.target.files[0];
+                if (file && (file.type.startsWith('audio/') || file.name.endsWith('.mp3'))) {
+                    handleCustomAudioUpload(file, 'call');
+                } else {
+                    showNotification('Please select a valid audio file (MP3 recommended)');
+                }
             });
         }
 
-        // Initialize Web Audio API
-        function initAudio() {
-            // Create Audio Context
-            const AudioContext = window.AudioContext || window.webkitAudioContext;
-            if (AudioContext) {
-                // Web Audio API is supported
-                // We'll use it for more precise control if needed
+        // Handle custom audio upload
+        function handleCustomAudioUpload(file, type) {
+            const fileName = file.name;
+            const fileSize = (file.size / 1024 / 1024).toFixed(2);
+            
+            if (fileSize > 5) {
+                showNotification('File size too large. Max 5MB.');
+                return;
             }
             
-            // Set initial volumes
-            updateAudioVolumes();
+            // Create object URL for the file
+            const objectUrl = URL.createObjectURL(file);
+            
+            // Save to app state
+            appState.customAudio[type] = {
+                name: fileName,
+                url: objectUrl,
+                file: file
+            };
+            
+            // Update UI
+            updateCustomAudioDisplay(type, fileName);
+            
+            // Select custom audio
+            if (type === 'ringtone') {
+                selectCustomRingtone();
+            } else {
+                selectCustomCallAudio();
+            }
+            
+            showNotification(`${type === 'ringtone' ? 'Custom ringtone' : 'Custom call audio'} uploaded`);
         }
 
-        // Update audio volumes
-        function updateAudioVolumes() {
-            elements.ringtoneAudio.volume = appState.ringtoneVolume;
-            elements.callAudio.volume = appState.callVolume;
+        // Update custom audio display in UI
+        function updateCustomAudioDisplay(type, fileName) {
+            const displayDiv = type === 'ringtone' ? elements.customRingtoneDisplay : elements.customCallAudioDisplay;
+            const uploadDiv = type === 'ringtone' ? elements.customRingtoneUpload : elements.customCallAudioUpload;
+            
+            displayDiv.style.display = 'block';
+            displayDiv.innerHTML = `
+                <div class="custom-audio-file">
+                    <i class="fas fa-file-audio"></i>
+                    <div class="custom-audio-name" title="${fileName}">${fileName}</div>
+                    <button class="custom-audio-delete" data-type="${type}">
+                        <i class="fas fa-trash"></i>
+                    </button>
+                </div>
+            `;
+            
+            uploadDiv.style.display = 'none';
+            
+            // Add delete event listener
+            displayDiv.querySelector('.custom-audio-delete').addEventListener('click', () => {
+                deleteCustomAudio(type);
+            });
+        }
+
+        // Delete custom audio
+        function deleteCustomAudio(type) {
+            // Revoke object URL
+            if (appState.customAudio[type]?.url) {
+                URL.revokeObjectURL(appState.customAudio[type].url);
+            }
+            
+            // Clear from app state
+            appState.customAudio[type] = null;
+            
+            // Update UI
+            const displayDiv = type === 'ringtone' ? elements.customRingtoneDisplay : elements.customCallAudioDisplay;
+            const uploadDiv = type === 'ringtone' ? elements.customRingtoneUpload : elements.customCallAudioUpload;
+            
+            displayDiv.style.display = 'none';
+            uploadDiv.style.display = 'block';
+            
+            // Reset to default selection
+            if (type === 'ringtone') {
+                selectRingtone('classic');
+            } else {
+                selectCallAudio('conversation');
+            }
+            
+            // Clear file input
+            if (type === 'ringtone') {
+                elements.ringtoneUpload.value = '';
+            } else {
+                elements.callAudioUpload.value = '';
+            }
+            
+            showNotification(`Custom ${type} removed`);
+        }
+
+        // Select custom ringtone
+        function selectCustomRingtone() {
+            appState.selectedRingtone = 'custom';
+            
+            // Update UI
+            document.querySelectorAll('#ringtoneOptions .audio-option').forEach(opt => {
+                opt.classList.remove('active');
+                const checkIcon = opt.querySelector('.fa-check');
+                if (checkIcon) {
+                    checkIcon.style.display = 'none';
+                }
+            });
+            
+            // If ringing, update the ringtone
+            if (appState.isRinging) {
+                playRingtone();
+            }
+        }
+
+        // Select custom call audio
+        function selectCustomCallAudio() {
+            appState.selectedCallAudio = 'custom';
+            
+            // Update UI
+            document.querySelectorAll('#callAudioOptions .audio-option').forEach(opt => {
+                opt.classList.remove('active');
+                const checkIcon = opt.querySelector('.fa-check');
+                if (checkIcon) {
+                    checkIcon.style.display = 'none';
+                }
+            });
+            
+            // If in call, update the call audio
+            if (appState.isInCall) {
+                playCallAudio();
+            }
+        }
+
+        // Play audio preview
+        async function playPreview(audioId, type) {
+            stopAllAudio();
+            
+            let audioUrl;
+            let audioElement;
+            
+            if (type === 'ringtone') {
+                audioElement = elements.currentRingtone;
+                if (audioId === 'custom' && appState.customAudio.ringtone) {
+                    audioUrl = appState.customAudio.ringtone.url;
+                } else {
+                    const audioInfo = audioData.ringtones.find(a => a.id === audioId);
+                    if (!audioInfo) return;
+                    audioUrl = audioInfo.url;
+                }
+                audioElement.volume = appState.ringtoneVolume;
+            } else {
+                audioElement = elements.currentCallAudio;
+                if (audioId === 'custom' && appState.customAudio.callAudio) {
+                    audioUrl = appState.customAudio.callAudio.url;
+                } else {
+                    const audioInfo = audioData.callAudio.find(a => a.id === audioId);
+                    if (!audioInfo) return;
+                    audioUrl = audioInfo.url;
+                }
+                audioElement.volume = appState.callVolume;
+            }
+            
+            try {
+                const previewBtn = document.querySelector(`.audio-preview[data-audio-id="${audioId}"][data-type="${type}"]`);
+                if (previewBtn) {
+                    previewBtn.innerHTML = '<i class="fas fa-stop"></i> Stop';
+                }
+                
+                audioElement.src = audioUrl;
+                audioElement.loop = false;
+                
+                await audioElement.play();
+                
+                audioElement.addEventListener('ended', () => {
+                    if (previewBtn) {
+                        previewBtn.innerHTML = '<i class="fas fa-play"></i> Preview';
+                    }
+                }, { once: true });
+                
+                const stopHandler = () => {
+                    audioElement.pause();
+                    audioElement.currentTime = 0;
+                    if (previewBtn) {
+                        previewBtn.innerHTML = '<i class="fas fa-play"></i> Preview';
+                    }
+                    previewBtn.removeEventListener('click', stopHandler);
+                };
+                
+                previewBtn.addEventListener('click', stopHandler, { once: true });
+                
+            } catch (error) {
+                console.error('Error playing preview:', error);
+                showNotification('Failed to play audio preview. Make sure volume is up.');
+            }
+        }
+
+        // Stop all audio
+        function stopAllAudio() {
+            elements.currentRingtone.pause();
+            elements.currentRingtone.currentTime = 0;
+            elements.currentCallAudio.pause();
+            elements.currentCallAudio.currentTime = 0;
+            elements.continuousBackgroundAudio.pause();
+            elements.continuousBackgroundAudio.currentTime = 0;
+            
+            // Reset preview buttons
+            document.querySelectorAll('.audio-preview').forEach(btn => {
+                btn.innerHTML = '<i class="fas fa-play"></i> Preview';
+            });
         }
 
         // Select ringtone
@@ -1006,7 +1445,7 @@
                 opt.classList.toggle('active', opt.dataset.id === id);
                 const checkIcon = opt.querySelector('.fa-check');
                 if (checkIcon) {
-                    checkIcon.style.display = opt.dataset.id === id ? 'block' : 'none';
+                    checkIcon.style.display = opt.dataset.id === id ? 'inline-block' : 'none';
                 }
             });
             
@@ -1025,7 +1464,7 @@
                 opt.classList.toggle('active', opt.dataset.id === id);
                 const checkIcon = opt.querySelector('.fa-check');
                 if (checkIcon) {
-                    checkIcon.style.display = opt.dataset.id === id ? 'block' : 'none';
+                    checkIcon.style.display = opt.dataset.id === id ? 'inline-block' : 'none';
                 }
             });
             
@@ -1037,23 +1476,36 @@
 
         // Play ringtone
         function playRingtone() {
-            // Stop any existing ringtone
             stopRingtone();
             
-            // Generate ringtone based on selection
-            generateRingtone();
+            let audioUrl;
             
-            // Play the ringtone
-            elements.ringtoneAudio.currentTime = 0;
-            elements.ringtoneAudio.loop = true;
-            elements.ringtoneAudio.play().catch(e => console.log('Audio play failed:', e));
+            if (appState.selectedRingtone === 'custom' && appState.customAudio.ringtone) {
+                audioUrl = appState.customAudio.ringtone.url;
+            } else {
+                const ringtoneInfo = audioData.ringtones.find(r => r.id === appState.selectedRingtone);
+                if (!ringtoneInfo) {
+                    // Fallback to classic if not found
+                    audioUrl = audioData.ringtones[0].url;
+                } else {
+                    audioUrl = ringtoneInfo.url;
+                }
+            }
             
-            // Start vibration if enabled
+            elements.currentRingtone.src = audioUrl;
+            elements.currentRingtone.volume = appState.ringtoneVolume;
+            elements.currentRingtone.loop = true;
+            
+            elements.currentRingtone.play().catch(e => {
+                console.error('Ringtone play failed:', e);
+                showNotification('Failed to play ringtone. Check your volume settings.');
+            });
+            
+            // Start effects
             if (appState.vibrationEnabled) {
                 startVibration();
             }
             
-            // Start flash if enabled
             if (appState.flashEnabled) {
                 startFlash();
             }
@@ -1063,102 +1515,77 @@
 
         // Stop ringtone
         function stopRingtone() {
-            elements.ringtoneAudio.pause();
-            elements.ringtoneAudio.currentTime = 0;
+            elements.currentRingtone.pause();
+            elements.currentRingtone.currentTime = 0;
             appState.isRinging = false;
-            
-            // Stop effects
             stopVibration();
             stopFlash();
         }
 
         // Play call audio
         function playCallAudio() {
-            // Stop any existing call audio
             stopCallAudio();
             
-            // Generate call audio based on selection
-            generateCallAudio();
+            let audioUrl;
             
-            // Play the call audio
-            elements.callAudio.currentTime = 0;
-            elements.callAudio.loop = true;
-            elements.callAudio.play().catch(e => console.log('Call audio play failed:', e));
+            if (appState.selectedCallAudio === 'custom' && appState.customAudio.callAudio) {
+                audioUrl = appState.customAudio.callAudio.url;
+            } else {
+                const callAudioInfo = audioData.callAudio.find(c => c.id === appState.selectedCallAudio);
+                if (!callAudioInfo) {
+                    // Fallback to conversation if not found
+                    audioUrl = audioData.callAudio[0].url;
+                } else {
+                    audioUrl = callAudioInfo.url;
+                }
+            }
+            
+            elements.currentCallAudio.src = audioUrl;
+            elements.currentCallAudio.volume = appState.callVolume;
+            elements.currentCallAudio.loop = true;
+            
+            elements.currentCallAudio.play().catch(e => {
+                console.error('Call audio play failed:', e);
+                showNotification('Call audio failed to play. Trying alternative...');
+                // Try playing without loop
+                elements.currentCallAudio.loop = false;
+                elements.currentCallAudio.play().catch(e2 => {
+                    console.error('Second attempt failed:', e2);
+                });
+            });
+            
+            // Play continuous background audio if enabled
+            if (appState.continuousAudioEnabled) {
+                playContinuousAudio();
+            }
             
             appState.isInCall = true;
         }
 
+        // Play continuous background audio
+        function playContinuousAudio() {
+            elements.continuousBackgroundAudio.volume = appState.continuousAudioVolume;
+            elements.continuousBackgroundAudio.loop = true;
+            
+            elements.continuousBackgroundAudio.play().catch(e => {
+                console.error('Continuous audio play failed:', e);
+            });
+        }
+
         // Stop call audio
         function stopCallAudio() {
-            elements.callAudio.pause();
-            elements.callAudio.currentTime = 0;
+            elements.currentCallAudio.pause();
+            elements.currentCallAudio.currentTime = 0;
+            elements.continuousBackgroundAudio.pause();
+            elements.continuousBackgroundAudio.currentTime = 0;
             appState.isInCall = false;
-        }
-
-        // Generate ringtone using Web Audio API
-        function generateRingtone() {
-            const audioContext = new (window.AudioContext || window.webkitAudioContext)();
-            const oscillator = audioContext.createOscillator();
-            const gainNode = audioContext.createGain();
-            
-            // Configure based on selected ringtone
-            switch(appState.selectedRingtone) {
-                case 'classic':
-                    oscillator.type = 'sine';
-                    oscillator.frequency.setValueAtTime(440, audioContext.currentTime);
-                    oscillator.frequency.setValueAtTime(440, audioContext.currentTime + 0.1);
-                    oscillator.frequency.setValueAtTime(350, audioContext.currentTime + 0.2);
-                    break;
-                case 'digital':
-                    oscillator.type = 'square';
-                    oscillator.frequency.setValueAtTime(800, audioContext.currentTime);
-                    break;
-                case 'melody':
-                    oscillator.type = 'sine';
-                    // Simple melody
-                    oscillator.frequency.setValueAtTime(523.25, audioContext.currentTime); // C5
-                    oscillator.frequency.setValueAtTime(659.25, audioContext.currentTime + 0.2); // E5
-                    oscillator.frequency.setValueAtTime(783.99, audioContext.currentTime + 0.4); // G5
-                    break;
-                case 'pulse':
-                    oscillator.type = 'sine';
-                    oscillator.frequency.setValueAtTime(600, audioContext.currentTime);
-                    break;
-                case 'echo':
-                    oscillator.type = 'sine';
-                    oscillator.frequency.setValueAtTime(500, audioContext.currentTime);
-                    break;
-            }
-            
-            // Create envelope for ringtone
-            gainNode.gain.setValueAtTime(0, audioContext.currentTime);
-            gainNode.gain.linearRampToValueAtTime(appState.ringtoneVolume, audioContext.currentTime + 0.05);
-            gainNode.gain.linearRampToValueAtTime(0, audioContext.currentTime + 0.3);
-            
-            // Connect and start
-            oscillator.connect(gainNode);
-            gainNode.connect(audioContext.destination);
-            oscillator.start();
-            oscillator.stop(audioContext.currentTime + 0.4);
-            
-            // For looping, we'd need to schedule multiple oscillators
-            // This is simplified for demo purposes
-        }
-
-        // Generate call audio
-        function generateCallAudio() {
-            // In a real implementation, this would generate or load
-            // appropriate background audio for the call
-            // For now, we'll use a placeholder
         }
 
         // Start vibration effect
         function startVibration() {
             if (appState.vibrationInterval) clearInterval(appState.vibrationInterval);
             
-            // Simulate vibration with visual feedback
             appState.vibrationInterval = setInterval(() => {
-                // Add a subtle shake to the call screen
                 elements.callScreen.style.transform = 'translateX(2px)';
                 setTimeout(() => {
                     elements.callScreen.style.transform = 'translateX(-2px)';
@@ -1201,22 +1628,16 @@
 
         // Start incoming call
         function startIncomingCall() {
-            // Update caller info from profile
             elements.callerName.textContent = appState.callerProfile.name;
-            
-            // Update avatar
             updateCallerAvatar();
             
-            // Show call screen
             elements.callScreen.classList.add('active');
             elements.mainMenu.style.display = 'none';
             
-            // Set status
             elements.callStatus.textContent = 'Incoming call...';
             elements.callTimer.style.display = 'none';
             elements.muteBtn.style.display = 'none';
             
-            // Start ringtone
             playRingtone();
             
             appState.isCallActive = true;
@@ -1225,19 +1646,15 @@
 
         // Answer call
         function answerCall() {
-            // Stop ringtone and effects
             stopRingtone();
             
-            // Start call timer
             appState.callStartTime = new Date();
             startCallTimer();
             
-            // Update UI
             elements.callStatus.textContent = 'Connected';
             elements.callTimer.style.display = 'block';
             elements.muteBtn.style.display = 'block';
             
-            // Start call audio
             playCallAudio();
             
             appState.isRinging = false;
@@ -1246,15 +1663,12 @@
 
         // Decline call
         function declineCall() {
-            // Stop all audio and effects
             stopRingtone();
             stopCallAudio();
             
-            // Hide call screen
             elements.callScreen.classList.remove('active');
             elements.mainMenu.style.display = 'flex';
             
-            // Reset timer
             if (appState.timerInterval) {
                 clearInterval(appState.timerInterval);
                 appState.timerInterval = null;
@@ -1292,7 +1706,7 @@
 
         // Show notification
         function showNotification(message) {
-            elements.notification.querySelector('span').textContent = message;
+            elements.notificationText.textContent = message;
             elements.notification.classList.add('active');
             
             setTimeout(() => {
@@ -1315,34 +1729,44 @@
         function loadSettings() {
             const saved = localStorage.getItem('callSimulatorSettings');
             if (saved) {
-                const settings = JSON.parse(saved);
-                
-                // Apply settings
-                appState.selectedRingtone = settings.selectedRingtone || appState.selectedRingtone;
-                appState.selectedCallAudio = settings.selectedCallAudio || appState.selectedCallAudio;
-                appState.ringtoneVolume = settings.ringtoneVolume || appState.ringtoneVolume;
-                appState.callVolume = settings.callVolume || appState.callVolume;
-                appState.vibrationEnabled = settings.vibrationEnabled !== undefined ? settings.vibrationEnabled : appState.vibrationEnabled;
-                appState.flashEnabled = settings.flashEnabled !== undefined ? settings.flashEnabled : appState.flashEnabled;
-                appState.callerProfile = settings.callerProfile || appState.callerProfile;
-                
-                // Update UI
-                elements.ringtoneVolume.value = appState.ringtoneVolume * 100;
-                elements.callVolume.value = appState.callVolume * 100;
-                elements.vibrationToggle.checked = appState.vibrationEnabled;
-                elements.flashToggle.checked = appState.flashEnabled;
-                elements.callerNameInput.value = appState.callerProfile.name;
-                elements.callerNumberInput.value = appState.callerProfile.number;
-                elements.callTypeInput.value = appState.callerProfile.type;
-                
-                // Update avatar if exists
-                if (appState.callerProfile.avatar) {
-                    updateCallerAvatar();
+                try {
+                    const settings = JSON.parse(saved);
+                    
+                    // Apply settings
+                    appState.selectedRingtone = settings.selectedRingtone || appState.selectedRingtone;
+                    appState.selectedCallAudio = settings.selectedCallAudio || appState.selectedCallAudio;
+                    appState.ringtoneVolume = settings.ringtoneVolume || appState.ringtoneVolume;
+                    appState.callVolume = settings.callVolume || appState.callVolume;
+                    appState.vibrationEnabled = settings.vibrationEnabled !== undefined ? settings.vibrationEnabled : appState.vibrationEnabled;
+                    appState.flashEnabled = settings.flashEnabled !== undefined ? settings.flashEnabled : appState.flashEnabled;
+                    appState.continuousAudioEnabled = settings.continuousAudioEnabled !== undefined ? settings.continuousAudioEnabled : appState.continuousAudioEnabled;
+                    appState.callerProfile = settings.callerProfile || appState.callerProfile;
+                    
+                    // Update UI
+                    elements.ringtoneVolume.value = appState.ringtoneVolume * 100;
+                    elements.ringtoneVolumeValue.textContent = `${Math.round(appState.ringtoneVolume * 100)}%`;
+                    elements.callVolume.value = appState.callVolume * 100;
+                    elements.callVolumeValue.textContent = `${Math.round(appState.callVolume * 100)}%`;
+                    elements.vibrationToggle.checked = appState.vibrationEnabled;
+                    elements.flashToggle.checked = appState.flashEnabled;
+                    elements.continuousAudioToggle.checked = appState.continuousAudioEnabled;
+                    elements.callerNameInput.value = appState.callerProfile.name;
+                    elements.callerNumberInput.value = appState.callerProfile.number;
+                    elements.callTypeInput.value = appState.callerProfile.type;
+                    
+                    // Update avatar if exists
+                    if (appState.callerProfile.avatar) {
+                        updateCallerAvatar();
+                    }
+                    
+                    // Update audio option selections
+                    selectRingtone(appState.selectedRingtone);
+                    selectCallAudio(appState.selectedCallAudio);
+                    
+                } catch (e) {
+                    console.error('Error loading settings:', e);
+                    localStorage.removeItem('callSimulatorSettings');
                 }
-                
-                // Update audio option selections
-                selectRingtone(appState.selectedRingtone);
-                selectCallAudio(appState.selectedCallAudio);
             }
         }
 
@@ -1355,11 +1779,12 @@
                 callVolume: appState.callVolume,
                 vibrationEnabled: appState.vibrationEnabled,
                 flashEnabled: appState.flashEnabled,
+                continuousAudioEnabled: appState.continuousAudioEnabled,
                 callerProfile: appState.callerProfile
             };
             
             localStorage.setItem('callSimulatorSettings', JSON.stringify(settings));
-            showNotification('Settings saved successfully');
+            showNotification('Settings saved');
         }
 
         // Setup event listeners
@@ -1384,8 +1809,6 @@
                 elements.muteBtn.innerHTML = isMuted ? 
                     '<i class="fas fa-microphone"></i>' : 
                     '<i class="fas fa-microphone-slash"></i>';
-                
-                // In a real app, this would mute/unmute the microphone
                 showNotification(isMuted ? 'Microphone muted' : 'Microphone unmuted');
             });
 
@@ -1394,19 +1817,43 @@
                 elements.settingsModal.classList.remove('active');
             });
             elements.saveSettingsBtn.addEventListener('click', () => {
-                // Update app state from settings
                 appState.ringtoneVolume = elements.ringtoneVolume.value / 100;
                 appState.callVolume = elements.callVolume.value / 100;
                 appState.vibrationEnabled = elements.vibrationToggle.checked;
                 appState.flashEnabled = elements.flashToggle.checked;
+                appState.continuousAudioEnabled = elements.continuousAudioToggle.checked;
                 
-                // Update audio volumes
-                updateAudioVolumes();
+                elements.ringtoneVolumeValue.textContent = `${elements.ringtoneVolume.value}%`;
+                elements.callVolumeValue.textContent = `${elements.callVolume.value}%`;
                 
-                // Save settings
                 saveSettings();
-                
                 elements.settingsModal.classList.remove('active');
+            });
+
+            // Volume sliders
+            elements.ringtoneVolume.addEventListener('input', function() {
+                appState.ringtoneVolume = this.value / 100;
+                elements.ringtoneVolumeValue.textContent = `${this.value}%`;
+                elements.currentRingtone.volume = appState.ringtoneVolume;
+            });
+            
+            elements.callVolume.addEventListener('input', function() {
+                appState.callVolume = this.value / 100;
+                elements.callVolumeValue.textContent = `${this.value}%`;
+                elements.currentCallAudio.volume = appState.callVolume;
+                elements.continuousBackgroundAudio.volume = appState.continuousAudioVolume;
+            });
+
+            // Continuous audio toggle
+            elements.continuousAudioToggle.addEventListener('change', function() {
+                appState.continuousAudioEnabled = this.checked;
+                if (appState.isInCall) {
+                    if (this.checked) {
+                        playContinuousAudio();
+                    } else {
+                        elements.continuousBackgroundAudio.pause();
+                    }
+                }
             });
 
             // Caller modal
@@ -1417,7 +1864,6 @@
                 appState.callerProfile.name = elements.callerNameInput.value;
                 appState.callerProfile.number = elements.callerNumberInput.value;
                 appState.callerProfile.type = elements.callTypeInput.value;
-                
                 saveSettings();
                 elements.callerModal.classList.remove('active');
             });
@@ -1453,23 +1899,20 @@
                 
                 const delay = scheduleTime.getTime() - now.getTime();
                 
-                // Clear any existing scheduled call
                 if (appState.scheduledCallTimeout) {
                     clearTimeout(appState.scheduledCallTimeout);
                 }
                 
-                // Schedule the call
                 appState.scheduledCallTimeout = setTimeout(() => {
                     startIncomingCall();
                     showNotification('Scheduled call incoming!');
                 }, delay);
                 
-                // Show confirmation
                 const timeStr = scheduleTime.toLocaleTimeString([], {hour: '2-digit', minute:'2-digit'});
                 elements.scheduleText.textContent = `Call scheduled for ${timeStr}`;
                 elements.scheduleInfo.style.display = 'block';
                 
-                showNotification('Call scheduled successfully');
+                showNotification('Call scheduled');
                 setTimeout(() => {
                     elements.scheduleModal.classList.remove('active');
                 }, 1500);
@@ -1484,31 +1927,17 @@
                     
                     elements.scheduleTime.value = formatDateTimeLocal(scheduledTime);
                     
-                    // Highlight selected option
                     document.querySelectorAll('.schedule-option').forEach(opt => {
                         opt.classList.remove('active');
                     });
                     this.classList.add('active');
                     
-                    // Update info display
                     const timeStr = scheduledTime.toLocaleTimeString([], {hour: '2-digit', minute:'2-digit'});
                     elements.scheduleText.textContent = `Call will ring at ${timeStr}`;
                     elements.scheduleInfo.style.display = 'block';
                 });
             });
 
-            // Volume controls
-            elements.ringtoneVolume.addEventListener('input', function() {
-                appState.ringtoneVolume = this.value / 100;
-                updateAudioVolumes();
-            });
-            
-            elements.callVolume.addEventListener('input', function() {
-                appState.callVolume = this.value / 100;
-                updateAudioVolumes();
-            });
-
-            // Prevent context menu on long press
             document.addEventListener('contextmenu', (e) => e.preventDefault());
         }
 
